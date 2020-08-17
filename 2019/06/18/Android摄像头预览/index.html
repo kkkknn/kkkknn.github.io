@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.0.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="本篇主要写的是关于Android6.0 版本的摄像头预览 ,仅预览，没有实现拍照摄像功能">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android摄像头预览">
+<meta property="og:url" content="http://yoursite.com/2019/06/18/Android%E6%91%84%E5%83%8F%E5%A4%B4%E9%A2%84%E8%A7%88/index.html">
+<meta property="og:site_name" content="kkkkkn&#39;s的博客">
+<meta property="og:description" content="本篇主要写的是关于Android6.0 版本的摄像头预览 ,仅预览，没有实现拍照摄像功能">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-06-18T13:30:48.000Z">
+<meta property="article:modified_time" content="2019-07-21T14:01:16.000Z">
+<meta property="article:author" content="kkkkkn">
+<meta property="article:tag" content="Android6.0">
+<meta property="article:tag" content="摄像头">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2019/06/18/Android%E6%91%84%E5%83%8F%E5%A4%B4%E9%A2%84%E8%A7%88/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Android摄像头预览 | kkkkkn's的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">kkkkkn's的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Stick to it and work hard</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/06/18/Android%E6%91%84%E5%83%8F%E5%A4%B4%E9%A2%84%E8%A7%88/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="kkkkkn">
+      <meta itemprop="description" content="坚持并努力奋斗">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="kkkkkn's的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Android摄像头预览
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-06-18 21:30:48" itemprop="dateCreated datePublished" datetime="2019-06-18T21:30:48+08:00">2019-06-18</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-07-21 22:01:16" itemprop="dateModified" datetime="2019-07-21T22:01:16+08:00">2019-07-21</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android/" itemprop="url" rel="index"><span itemprop="name">Android</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>本篇主要写的是关于Android6.0 版本的摄像头预览 ,仅预览，没有实现拍照摄像功能</p>
+<a id="more"></a>
+
+<h1 id="Android摄像头的预览"><a href="#Android摄像头的预览" class="headerlink" title="Android摄像头的预览"></a>Android摄像头的预览</h1><h2 id="实现方法"><a href="#实现方法" class="headerlink" title="实现方法"></a>实现方法</h2><p>主要展示使用surfaceview 来实现，详细步骤如下：</p>
+<ol>
+<li><p>在AndroidManifest.xml文件中进行权限申请，应为camera为危险权限，需要权限申请</p>
+<p>在申请一个权限后，同组的所有权限都会可用</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 照相机权限 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">uses-permission</span> <span class="attr">android:name</span>=<span class="string">&quot;android.permission.CAMERA&quot;</span> /&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ol>
+<ol start="2">
+<li><p>在进入主界面，调用onCreate方法的时候进行控件绑定（这里的BackMain方法是别的功能，与预览无关)</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">initView</span><span class="params">()</span></span>&#123;</span><br><span class="line">        btn_error=findViewById(R.id.btn_error);</span><br><span class="line">        btn_ok=findViewById(R.id.btn_ok);</span><br><span class="line">        btn_ok.setOnClickListener(<span class="keyword">new</span> View.OnClickListener() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onClick</span><span class="params">(View v)</span> </span>&#123;</span><br><span class="line">                BackMain(<span class="number">1</span>);</span><br><span class="line">                finish();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">        btn_error.setOnClickListener(<span class="keyword">new</span> View.OnClickListener() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onClick</span><span class="params">(View v)</span> </span>&#123;</span><br><span class="line">                BackMain(-<span class="number">1</span>);</span><br><span class="line">                finish();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">        surfaceView=findViewById(R.id.camera_view);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ol>
+<ol start="3">
+<li><p>摄像头的权限查询和申请，无权限申请权限，否则弹窗退出</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//判断是否拥有camera模块</span></span><br><span class="line"><span class="keyword">if</span>(Camera_show.<span class="keyword">this</span>.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA))&#123;</span><br><span class="line">    <span class="comment">//判断Android版本---6.0以下无需动态权限注册</span></span><br><span class="line">    <span class="keyword">if</span> (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.M) &#123;</span><br><span class="line">        <span class="keyword">if</span> (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) &#123;</span><br><span class="line">            <span class="comment">//权限申请--关键</span></span><br><span class="line">            requestPermissions(<span class="keyword">new</span> String[] &#123;Manifest.permission.CAMERA&#125;, <span class="number">1</span>);</span><br><span class="line">        &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">            Log.i(TAG, <span class="string">&quot;android 6.0版本以上有权限&quot;</span>);</span><br><span class="line">            camera_Preview();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">        Log.i(TAG, <span class="string">&quot;android 6.0版本以下有权限&quot;</span>);</span><br><span class="line">        camera_Preview();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">    <span class="comment">//无此模块直接弹出警告框退出</span></span><br><span class="line">    dialog_warning(<span class="string">&quot;此设备不支持相机，程序即将退出&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>此时代码运行到这里后，如果需要动态申请权限则会运行requestPermissions方法，调用此方法之后，软件会弹窗提示是否授权,点击确定或取消后会调用onRequestPermissionsResult方法，所以为了得到返回结果我们需要重写此方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//接收注册权限返回之后，重新申请相机权限并开始测试</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onRequestPermissionsResult</span><span class="params">(<span class="keyword">int</span> requestCode, <span class="meta">@NotNull</span> String[] permissions, <span class="meta">@NotNull</span> <span class="keyword">int</span>[] grantResults)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">switch</span> (requestCode) &#123;</span><br><span class="line">            <span class="keyword">case</span> <span class="number">1</span>: &#123;</span><br><span class="line">                <span class="comment">// If request is cancelled, the result arrays are empty.</span></span><br><span class="line">                <span class="keyword">if</span> (grantResults.length &gt; <span class="number">0</span> &amp;&amp; grantResults[<span class="number">0</span>] == PackageManager.PERMISSION_GRANTED) &#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">                    <span class="comment">// permission was granted, yay! Do the</span></span><br><span class="line">                    <span class="comment">// contacts-related task you need to do.</span></span><br><span class="line">                    Log.i(TAG, <span class="string">&quot;onRequestPermissionsResult: 权限申请通过了&quot;</span>);</span><br><span class="line">                    <span class="comment">//开始预览展示</span></span><br><span class="line">                    camera_Preview();</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    <span class="comment">//申请权限没有通过，弹出警告框，然后退出当前页面</span></span><br><span class="line">                    dialog_warning(<span class="string">&quot;没有通过照相机权限&quot;</span>);</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">default</span>:</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+</li>
+</ol>
+<ol start="4">
+<li><p>预览展示(camera_Preview方法)</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//相机预览展示</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">camera_Preview</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(surfaceCallback!=<span class="keyword">null</span>)&#123;</span><br><span class="line">            <span class="comment">//开启相机连接，开始预览  ------注：0,1参数是指的前后摄像头，具体定义还需自己测试（一般0为后置，1为前置）</span></span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                camera = Camera.open(<span class="number">1</span>);</span><br><span class="line">                Log.i(TAG, <span class="string">&quot;onCreate:获取成功 &quot;</span>);</span><br><span class="line">                <span class="comment">//设置角度</span></span><br><span class="line">                setCameraDisplayOrientation(Camera_show.<span class="keyword">this</span>,<span class="number">0</span>,camera);</span><br><span class="line"></span><br><span class="line">                <span class="comment">//获取surfaceholder对象</span></span><br><span class="line">                SurfaceHolder surfaceHolder=surfaceView.getHolder();</span><br><span class="line"></span><br><span class="line">                <span class="comment">//设置surface格式</span></span><br><span class="line">                <span class="comment">//参数:系统支持的透明度样式 int类型 详见 PixelFormat类</span></span><br><span class="line">                surfaceHolder.setFormat(PixelFormat.TRANSPARENT);</span><br><span class="line">                <span class="comment">//设置callback返回接口</span></span><br><span class="line">                surfaceHolder.addCallback(surfaceCallback);</span><br><span class="line">                <span class="comment">//再次调用创建方法</span></span><br><span class="line">                surfaceCallback.surfaceCreated(surfaceHolder);</span><br><span class="line"></span><br><span class="line">            &#125;<span class="keyword">catch</span> (Exception e)&#123;</span><br><span class="line">                Log.i(TAG, <span class="string">&quot;onCreate:摄像头被占用或打开失败，请关闭其他相机程序后再进行尝试 &quot;</span>);</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>根据摄像头方向和前后还需要调整角度否则换面会被拉伸</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//设置相机角度</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">setCameraDisplayOrientation</span><span class="params">(Activity activity, <span class="keyword">int</span> cameraId, android.hardware.Camera camera)</span></span>&#123;</span><br><span class="line">       Camera.CameraInfo cameraInfo=<span class="keyword">new</span> Camera.CameraInfo();</span><br><span class="line">       <span class="comment">//获取摄像头信息</span></span><br><span class="line">       Camera.getCameraInfo(cameraId,cameraInfo);</span><br><span class="line">       <span class="keyword">int</span> rotation=activity.getWindowManager().getDefaultDisplay().getRotation();</span><br><span class="line">       <span class="keyword">int</span> degrees = <span class="number">0</span>;</span><br><span class="line">       <span class="comment">//获取的当前摄像头的角度</span></span><br><span class="line">       <span class="keyword">switch</span>(rotation)&#123;</span><br><span class="line">           <span class="keyword">case</span> Surface.ROTATION_0:</span><br><span class="line">               degrees=<span class="number">0</span>;</span><br><span class="line">               <span class="keyword">break</span>;</span><br><span class="line">           <span class="keyword">case</span> Surface.ROTATION_90:</span><br><span class="line">               degrees=<span class="number">90</span>;</span><br><span class="line">               <span class="keyword">break</span>;</span><br><span class="line">           <span class="keyword">case</span> Surface.ROTATION_180:</span><br><span class="line">               degrees=<span class="number">180</span>;</span><br><span class="line">               <span class="keyword">break</span>;</span><br><span class="line">           <span class="keyword">case</span> Surface.ROTATION_270:</span><br><span class="line">               degrees=<span class="number">270</span>;</span><br><span class="line">               <span class="keyword">break</span>;</span><br><span class="line">       &#125;</span><br><span class="line">   </span><br><span class="line">       <span class="keyword">int</span> result=<span class="number">0</span>;</span><br><span class="line">       <span class="keyword">if</span>(cameraInfo.facing==Camera.CameraInfo.CAMERA_FACING_FRONT)&#123;</span><br><span class="line">           <span class="comment">//前置摄像头</span></span><br><span class="line">           result=(cameraInfo.orientation+degrees)%<span class="number">360</span>;</span><br><span class="line">           result=(<span class="number">360</span>-result)%<span class="number">360</span>;</span><br><span class="line">       &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">           <span class="comment">//后置摄像头</span></span><br><span class="line">           result=(cameraInfo.orientation-degrees+<span class="number">360</span>)%<span class="number">360</span>;</span><br><span class="line">       &#125;</span><br><span class="line">       <span class="comment">//设置camera角度</span></span><br><span class="line">       camera.setDisplayOrientation(result);</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ol>
+<h2 id="完整代码实例"><a href="#完整代码实例" class="headerlink" title="完整代码实例"></a>完整代码实例</h2><p>有些代码是其他功能，与摄像头预览功能无关</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.citrontek.FactoryTest.itemTest;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> android.Manifest;</span><br><span class="line"><span class="keyword">import</span> android.app.Activity;</span><br><span class="line"><span class="keyword">import</span> android.app.AlertDialog;</span><br><span class="line"><span class="keyword">import</span> android.content.DialogInterface;</span><br><span class="line"><span class="keyword">import</span> android.content.Intent;</span><br><span class="line"><span class="keyword">import</span> android.content.pm.PackageManager;</span><br><span class="line"><span class="keyword">import</span> android.graphics.PixelFormat;</span><br><span class="line"><span class="keyword">import</span> android.hardware.Camera;</span><br><span class="line"><span class="keyword">import</span> android.os.Build;</span><br><span class="line"><span class="keyword">import</span> android.os.Bundle;</span><br><span class="line"><span class="keyword">import</span> android.util.Log;</span><br><span class="line"><span class="keyword">import</span> android.view.Surface;</span><br><span class="line"><span class="keyword">import</span> android.view.SurfaceHolder;</span><br><span class="line"><span class="keyword">import</span> android.view.SurfaceView;</span><br><span class="line"><span class="keyword">import</span> android.view.View;</span><br><span class="line"><span class="keyword">import</span> android.widget.Button;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.citrontek.FactoryTest.R;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.jetbrains.annotations.NotNull;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Camera_show</span> <span class="keyword">extends</span> <span class="title">Activity</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> Button btn_ok,btn_error;</span><br><span class="line">    <span class="keyword">private</span> SurfaceView surfaceView;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">static</span> String TAG=<span class="string">&quot;相机测试&quot;</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">boolean</span> isView;     <span class="comment">//判断相机是否正在预览</span></span><br><span class="line">    <span class="keyword">private</span> Camera camera;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState);</span><br><span class="line">        setContentView(R.layout.item_camera);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//初始化控件</span></span><br><span class="line">        initView();</span><br><span class="line"></span><br><span class="line">        <span class="comment">//先开始申请权限，无权限或者不给权限直接退出</span></span><br><span class="line">        <span class="keyword">if</span>(Camera_show.<span class="keyword">this</span>.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA))&#123;</span><br><span class="line">            <span class="keyword">if</span> (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.M) &#123;</span><br><span class="line">                <span class="comment">//无权限注册权限</span></span><br><span class="line">                <span class="keyword">if</span> (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) &#123;</span><br><span class="line">                    requestPermissions(<span class="keyword">new</span> String[] &#123;Manifest.permission.CAMERA&#125;, <span class="number">1</span>);</span><br><span class="line">                &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">                    <span class="comment">//android 6.0 版本以上，查询到拥有权限则直接开始预览展示</span></span><br><span class="line">                    Log.i(TAG, <span class="string">&quot;android 6.0版本以上有权限&quot;</span>);</span><br><span class="line">                    camera_Preview();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">                <span class="comment">//6.0版本以下，不用动态申请权限，如果查询到有此权限则 直接开始预览展示</span></span><br><span class="line">                Log.i(TAG, <span class="string">&quot;android 6.0版本以下有权限&quot;</span>);</span><br><span class="line">                camera_Preview();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">            <span class="comment">//无此模块直接弹出警告框退出</span></span><br><span class="line">            dialog_warning(<span class="string">&quot;此设备不支持相机，程序即将退出&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">initView</span><span class="params">()</span></span>&#123;</span><br><span class="line">        btn_error=findViewById(R.id.btn_error);</span><br><span class="line">        btn_ok=findViewById(R.id.btn_ok);</span><br><span class="line">        btn_ok.setOnClickListener(<span class="keyword">new</span> View.OnClickListener() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onClick</span><span class="params">(View v)</span> </span>&#123;</span><br><span class="line">                BackMain(<span class="number">1</span>);</span><br><span class="line">                finish();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">        btn_error.setOnClickListener(<span class="keyword">new</span> View.OnClickListener() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onClick</span><span class="params">(View v)</span> </span>&#123;</span><br><span class="line">                BackMain(-<span class="number">1</span>);</span><br><span class="line">                finish();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">        surfaceView=findViewById(R.id.camera_view);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//相机预览展示</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">camera_Preview</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(surfaceCallback!=<span class="keyword">null</span>)&#123;</span><br><span class="line">            <span class="comment">//开启相机连接，开始预览  ------注：0,1参数是指的前后摄像头，具体定义还需自己测试（一般0为后置，1为前置）</span></span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                camera = Camera.open(<span class="number">1</span>);</span><br><span class="line">                Log.i(TAG, <span class="string">&quot;onCreate:获取成功 &quot;</span>);</span><br><span class="line">                <span class="comment">//设置角度</span></span><br><span class="line">                setCameraDisplayOrientation(Camera_show.<span class="keyword">this</span>,<span class="number">0</span>,camera);</span><br><span class="line"></span><br><span class="line">                <span class="comment">//获取surfaceholder对象</span></span><br><span class="line">                SurfaceHolder surfaceHolder=surfaceView.getHolder();</span><br><span class="line"></span><br><span class="line">                <span class="comment">//设置surface格式</span></span><br><span class="line">                <span class="comment">//参数:系统支持的透明度样式 int类型 详见 PixelFormat类</span></span><br><span class="line">                surfaceHolder.setFormat(PixelFormat.TRANSPARENT);</span><br><span class="line">                <span class="comment">//设置callback返回接口</span></span><br><span class="line">                surfaceHolder.addCallback(surfaceCallback);</span><br><span class="line">                <span class="comment">//再次调用创建方法</span></span><br><span class="line">                surfaceCallback.surfaceCreated(surfaceHolder);</span><br><span class="line"></span><br><span class="line">            &#125;<span class="keyword">catch</span> (Exception e)&#123;</span><br><span class="line">                Log.i(TAG, <span class="string">&quot;onCreate:摄像头被占用或打开失败，请关闭其他相机程序后再进行尝试 &quot;</span>);</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> SurfaceHolder.Callback surfaceCallback=<span class="keyword">new</span> SurfaceHolder.Callback() &#123;</span><br><span class="line">        <span class="comment">//首次创建时</span></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">surfaceCreated</span><span class="params">(SurfaceHolder holder)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                camera.setPreviewDisplay(holder);<span class="comment">//通过SurfaceView显示取景画面</span></span><br><span class="line">            &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">            camera.startPreview();<span class="comment">//开始预览</span></span><br><span class="line">            isView = <span class="keyword">true</span>;<span class="comment">//设置是否预览参数为真</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//发生改变时</span></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">surfaceChanged</span><span class="params">(SurfaceHolder holder, <span class="keyword">int</span> format, <span class="keyword">int</span> width, <span class="keyword">int</span> height)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//销毁时</span></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">surfaceDestroyed</span><span class="params">(SurfaceHolder holder)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">if</span>(camera!=<span class="keyword">null</span>)&#123;</span><br><span class="line">                <span class="keyword">if</span>(isView)&#123; <span class="comment">//正在预览</span></span><br><span class="line">                    camera.stopPreview();</span><br><span class="line">                    camera.release();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">//设置相机角度</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">setCameraDisplayOrientation</span><span class="params">(Activity activity, <span class="keyword">int</span> cameraId, android.hardware.Camera camera)</span></span>&#123;</span><br><span class="line">        Camera.CameraInfo cameraInfo=<span class="keyword">new</span> Camera.CameraInfo();</span><br><span class="line">        <span class="comment">//获取摄像头信息</span></span><br><span class="line">        Camera.getCameraInfo(cameraId,cameraInfo);</span><br><span class="line">        <span class="keyword">int</span> rotation=activity.getWindowManager().getDefaultDisplay().getRotation();</span><br><span class="line">        <span class="keyword">int</span> degrees = <span class="number">0</span>;</span><br><span class="line">        <span class="comment">//获取的当前摄像头的角度</span></span><br><span class="line">        <span class="keyword">switch</span>(rotation)&#123;</span><br><span class="line">            <span class="keyword">case</span> Surface.ROTATION_0:</span><br><span class="line">                degrees=<span class="number">0</span>;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> Surface.ROTATION_90:</span><br><span class="line">                degrees=<span class="number">90</span>;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> Surface.ROTATION_180:</span><br><span class="line">                degrees=<span class="number">180</span>;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> Surface.ROTATION_270:</span><br><span class="line">                degrees=<span class="number">270</span>;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> result=<span class="number">0</span>;</span><br><span class="line">        <span class="keyword">if</span>(cameraInfo.facing==Camera.CameraInfo.CAMERA_FACING_FRONT)&#123;</span><br><span class="line">            <span class="comment">//前置摄像头</span></span><br><span class="line">            result=(cameraInfo.orientation+degrees)%<span class="number">360</span>;</span><br><span class="line">            result=(<span class="number">360</span>-result)%<span class="number">360</span>;</span><br><span class="line">        &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">            <span class="comment">//后置摄像头</span></span><br><span class="line">            result=(cameraInfo.orientation-degrees+<span class="number">360</span>)%<span class="number">360</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        camera.setDisplayOrientation(result);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">BackMain</span><span class="params">(<span class="keyword">int</span> code)</span></span>&#123;</span><br><span class="line">        Intent intent=<span class="keyword">new</span> Intent();</span><br><span class="line">        intent.putExtra(<span class="string">&quot;检测情况&quot;</span>,code);</span><br><span class="line">        setResult(RESULT_OK,intent);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//接收注册权限返回之后，重新申请相机权限并开始测试</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onRequestPermissionsResult</span><span class="params">(<span class="keyword">int</span> requestCode, <span class="meta">@NotNull</span> String[] permissions, <span class="meta">@NotNull</span> <span class="keyword">int</span>[] grantResults)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">switch</span> (requestCode) &#123;</span><br><span class="line">            <span class="keyword">case</span> <span class="number">1</span>: &#123;</span><br><span class="line">                <span class="comment">// If request is cancelled, the result arrays are empty.</span></span><br><span class="line">                <span class="keyword">if</span> (grantResults.length &gt; <span class="number">0</span> &amp;&amp; grantResults[<span class="number">0</span>] == PackageManager.PERMISSION_GRANTED) &#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">                    <span class="comment">// permission was granted, yay! Do the</span></span><br><span class="line">                    <span class="comment">// contacts-related task you need to do.</span></span><br><span class="line">                    Log.i(TAG, <span class="string">&quot;onRequestPermissionsResult: 权限申请通过了&quot;</span>);</span><br><span class="line"></span><br><span class="line">                    camera_Preview();</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    <span class="comment">//申请权限没有通过，弹出警告框，然后退出当前页面</span></span><br><span class="line">                    dialog_warning(<span class="string">&quot;没有通过照相机权限&quot;</span>);</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">default</span>:</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">dialog_warning</span><span class="params">(String msg_str)</span></span>&#123;</span><br><span class="line">        AlertDialog.Builder dialog=<span class="keyword">new</span> AlertDialog.Builder(Camera_show.<span class="keyword">this</span>);</span><br><span class="line">        dialog.setTitle(<span class="string">&quot;警告&quot;</span>);</span><br><span class="line">        dialog.setMessage(msg_str);</span><br><span class="line">        dialog.setCancelable(<span class="keyword">false</span>);</span><br><span class="line">        dialog.setPositiveButton(<span class="string">&quot;我知道了&quot;</span>, <span class="keyword">new</span> DialogInterface.OnClickListener() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onClick</span><span class="params">(DialogInterface dialog, <span class="keyword">int</span> which)</span> </span>&#123;</span><br><span class="line">                <span class="comment">//退出程序</span></span><br><span class="line">                finish();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">        dialog.show();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Android6-0/" rel="tag"># Android6.0</a>
+              <a href="/tags/%E6%91%84%E5%83%8F%E5%A4%B4/" rel="tag"># 摄像头</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/06/05/%E5%8D%9A%E5%AE%A2%E8%AF%B4%E6%98%8E/" rel="prev" title="博客说明">
+      <i class="fa fa-chevron-left"></i> 博客说明
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/07/15/Hexo%E8%AF%AD%E6%B3%95%E8%AE%B0%E5%BD%95/" rel="next" title="Hexo语法记录">
+      Hexo语法记录 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Android%E6%91%84%E5%83%8F%E5%A4%B4%E7%9A%84%E9%A2%84%E8%A7%88"><span class="nav-text">Android摄像头的预览</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E6%96%B9%E6%B3%95"><span class="nav-text">实现方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%8C%E6%95%B4%E4%BB%A3%E7%A0%81%E5%AE%9E%E4%BE%8B"><span class="nav-text">完整代码实例</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="kkkkkn"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">kkkkkn</p>
+  <div class="site-description" itemprop="description">坚持并努力奋斗</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">23</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/kkkknn" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;kkkknn" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">kkkkkn</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

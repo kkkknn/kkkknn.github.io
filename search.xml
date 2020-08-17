@@ -1,0 +1,946 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  <entry>
+    <title>Android摄像头预览</title>
+    <url>/2019/06/18/Android%E6%91%84%E5%83%8F%E5%A4%B4%E9%A2%84%E8%A7%88/</url>
+    <content><![CDATA[<p>本篇主要写的是关于Android6.0 版本的摄像头预览 ,仅预览，没有实现拍照摄像功能</p>
+<a id="more"></a>
+
+<h1 id="Android摄像头的预览"><a href="#Android摄像头的预览" class="headerlink" title="Android摄像头的预览"></a>Android摄像头的预览</h1><h2 id="实现方法"><a href="#实现方法" class="headerlink" title="实现方法"></a>实现方法</h2><p>主要展示使用surfaceview 来实现，详细步骤如下：</p>
+<ol>
+<li><p>在AndroidManifest.xml文件中进行权限申请，应为camera为危险权限，需要权限申请</p>
+<p>在申请一个权限后，同组的所有权限都会可用</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 照相机权限 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">uses-permission</span> <span class="attr">android:name</span>=<span class="string">&quot;android.permission.CAMERA&quot;</span> /&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ol>
+<ol start="2">
+<li><p>在进入主界面，调用onCreate方法的时候进行控件绑定（这里的BackMain方法是别的功能，与预览无关)</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">initView</span><span class="params">()</span></span>&#123;</span><br><span class="line">        btn_error=findViewById(R.id.btn_error);</span><br><span class="line">        btn_ok=findViewById(R.id.btn_ok);</span><br><span class="line">        btn_ok.setOnClickListener(<span class="keyword">new</span> View.OnClickListener() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onClick</span><span class="params">(View v)</span> </span>&#123;</span><br><span class="line">                BackMain(<span class="number">1</span>);</span><br><span class="line">                finish();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">        btn_error.setOnClickListener(<span class="keyword">new</span> View.OnClickListener() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onClick</span><span class="params">(View v)</span> </span>&#123;</span><br><span class="line">                BackMain(-<span class="number">1</span>);</span><br><span class="line">                finish();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">        surfaceView=findViewById(R.id.camera_view);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ol>
+<ol start="3">
+<li><p>摄像头的权限查询和申请，无权限申请权限，否则弹窗退出</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//判断是否拥有camera模块</span></span><br><span class="line"><span class="keyword">if</span>(Camera_show.<span class="keyword">this</span>.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA))&#123;</span><br><span class="line">    <span class="comment">//判断Android版本---6.0以下无需动态权限注册</span></span><br><span class="line">    <span class="keyword">if</span> (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.M) &#123;</span><br><span class="line">        <span class="keyword">if</span> (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) &#123;</span><br><span class="line">            <span class="comment">//权限申请--关键</span></span><br><span class="line">            requestPermissions(<span class="keyword">new</span> String[] &#123;Manifest.permission.CAMERA&#125;, <span class="number">1</span>);</span><br><span class="line">        &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">            Log.i(TAG, <span class="string">&quot;android 6.0版本以上有权限&quot;</span>);</span><br><span class="line">            camera_Preview();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">        Log.i(TAG, <span class="string">&quot;android 6.0版本以下有权限&quot;</span>);</span><br><span class="line">        camera_Preview();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">    <span class="comment">//无此模块直接弹出警告框退出</span></span><br><span class="line">    dialog_warning(<span class="string">&quot;此设备不支持相机，程序即将退出&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>此时代码运行到这里后，如果需要动态申请权限则会运行requestPermissions方法，调用此方法之后，软件会弹窗提示是否授权,点击确定或取消后会调用onRequestPermissionsResult方法，所以为了得到返回结果我们需要重写此方法</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//接收注册权限返回之后，重新申请相机权限并开始测试</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onRequestPermissionsResult</span><span class="params">(<span class="keyword">int</span> requestCode, <span class="meta">@NotNull</span> String[] permissions, <span class="meta">@NotNull</span> <span class="keyword">int</span>[] grantResults)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">switch</span> (requestCode) &#123;</span><br><span class="line">            <span class="keyword">case</span> <span class="number">1</span>: &#123;</span><br><span class="line">                <span class="comment">// If request is cancelled, the result arrays are empty.</span></span><br><span class="line">                <span class="keyword">if</span> (grantResults.length &gt; <span class="number">0</span> &amp;&amp; grantResults[<span class="number">0</span>] == PackageManager.PERMISSION_GRANTED) &#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">                    <span class="comment">// permission was granted, yay! Do the</span></span><br><span class="line">                    <span class="comment">// contacts-related task you need to do.</span></span><br><span class="line">                    Log.i(TAG, <span class="string">&quot;onRequestPermissionsResult: 权限申请通过了&quot;</span>);</span><br><span class="line">                    <span class="comment">//开始预览展示</span></span><br><span class="line">                    camera_Preview();</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    <span class="comment">//申请权限没有通过，弹出警告框，然后退出当前页面</span></span><br><span class="line">                    dialog_warning(<span class="string">&quot;没有通过照相机权限&quot;</span>);</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">default</span>:</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+</li>
+</ol>
+<ol start="4">
+<li><p>预览展示(camera_Preview方法)</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//相机预览展示</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">camera_Preview</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(surfaceCallback!=<span class="keyword">null</span>)&#123;</span><br><span class="line">            <span class="comment">//开启相机连接，开始预览  ------注：0,1参数是指的前后摄像头，具体定义还需自己测试（一般0为后置，1为前置）</span></span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                camera = Camera.open(<span class="number">1</span>);</span><br><span class="line">                Log.i(TAG, <span class="string">&quot;onCreate:获取成功 &quot;</span>);</span><br><span class="line">                <span class="comment">//设置角度</span></span><br><span class="line">                setCameraDisplayOrientation(Camera_show.<span class="keyword">this</span>,<span class="number">0</span>,camera);</span><br><span class="line"></span><br><span class="line">                <span class="comment">//获取surfaceholder对象</span></span><br><span class="line">                SurfaceHolder surfaceHolder=surfaceView.getHolder();</span><br><span class="line"></span><br><span class="line">                <span class="comment">//设置surface格式</span></span><br><span class="line">                <span class="comment">//参数:系统支持的透明度样式 int类型 详见 PixelFormat类</span></span><br><span class="line">                surfaceHolder.setFormat(PixelFormat.TRANSPARENT);</span><br><span class="line">                <span class="comment">//设置callback返回接口</span></span><br><span class="line">                surfaceHolder.addCallback(surfaceCallback);</span><br><span class="line">                <span class="comment">//再次调用创建方法</span></span><br><span class="line">                surfaceCallback.surfaceCreated(surfaceHolder);</span><br><span class="line"></span><br><span class="line">            &#125;<span class="keyword">catch</span> (Exception e)&#123;</span><br><span class="line">                Log.i(TAG, <span class="string">&quot;onCreate:摄像头被占用或打开失败，请关闭其他相机程序后再进行尝试 &quot;</span>);</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>根据摄像头方向和前后还需要调整角度否则换面会被拉伸</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//设置相机角度</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">setCameraDisplayOrientation</span><span class="params">(Activity activity, <span class="keyword">int</span> cameraId, android.hardware.Camera camera)</span></span>&#123;</span><br><span class="line">       Camera.CameraInfo cameraInfo=<span class="keyword">new</span> Camera.CameraInfo();</span><br><span class="line">       <span class="comment">//获取摄像头信息</span></span><br><span class="line">       Camera.getCameraInfo(cameraId,cameraInfo);</span><br><span class="line">       <span class="keyword">int</span> rotation=activity.getWindowManager().getDefaultDisplay().getRotation();</span><br><span class="line">       <span class="keyword">int</span> degrees = <span class="number">0</span>;</span><br><span class="line">       <span class="comment">//获取的当前摄像头的角度</span></span><br><span class="line">       <span class="keyword">switch</span>(rotation)&#123;</span><br><span class="line">           <span class="keyword">case</span> Surface.ROTATION_0:</span><br><span class="line">               degrees=<span class="number">0</span>;</span><br><span class="line">               <span class="keyword">break</span>;</span><br><span class="line">           <span class="keyword">case</span> Surface.ROTATION_90:</span><br><span class="line">               degrees=<span class="number">90</span>;</span><br><span class="line">               <span class="keyword">break</span>;</span><br><span class="line">           <span class="keyword">case</span> Surface.ROTATION_180:</span><br><span class="line">               degrees=<span class="number">180</span>;</span><br><span class="line">               <span class="keyword">break</span>;</span><br><span class="line">           <span class="keyword">case</span> Surface.ROTATION_270:</span><br><span class="line">               degrees=<span class="number">270</span>;</span><br><span class="line">               <span class="keyword">break</span>;</span><br><span class="line">       &#125;</span><br><span class="line">   </span><br><span class="line">       <span class="keyword">int</span> result=<span class="number">0</span>;</span><br><span class="line">       <span class="keyword">if</span>(cameraInfo.facing==Camera.CameraInfo.CAMERA_FACING_FRONT)&#123;</span><br><span class="line">           <span class="comment">//前置摄像头</span></span><br><span class="line">           result=(cameraInfo.orientation+degrees)%<span class="number">360</span>;</span><br><span class="line">           result=(<span class="number">360</span>-result)%<span class="number">360</span>;</span><br><span class="line">       &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">           <span class="comment">//后置摄像头</span></span><br><span class="line">           result=(cameraInfo.orientation-degrees+<span class="number">360</span>)%<span class="number">360</span>;</span><br><span class="line">       &#125;</span><br><span class="line">       <span class="comment">//设置camera角度</span></span><br><span class="line">       camera.setDisplayOrientation(result);</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ol>
+<h2 id="完整代码实例"><a href="#完整代码实例" class="headerlink" title="完整代码实例"></a>完整代码实例</h2><p>有些代码是其他功能，与摄像头预览功能无关</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> com.citrontek.FactoryTest.itemTest;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> android.Manifest;</span><br><span class="line"><span class="keyword">import</span> android.app.Activity;</span><br><span class="line"><span class="keyword">import</span> android.app.AlertDialog;</span><br><span class="line"><span class="keyword">import</span> android.content.DialogInterface;</span><br><span class="line"><span class="keyword">import</span> android.content.Intent;</span><br><span class="line"><span class="keyword">import</span> android.content.pm.PackageManager;</span><br><span class="line"><span class="keyword">import</span> android.graphics.PixelFormat;</span><br><span class="line"><span class="keyword">import</span> android.hardware.Camera;</span><br><span class="line"><span class="keyword">import</span> android.os.Build;</span><br><span class="line"><span class="keyword">import</span> android.os.Bundle;</span><br><span class="line"><span class="keyword">import</span> android.util.Log;</span><br><span class="line"><span class="keyword">import</span> android.view.Surface;</span><br><span class="line"><span class="keyword">import</span> android.view.SurfaceHolder;</span><br><span class="line"><span class="keyword">import</span> android.view.SurfaceView;</span><br><span class="line"><span class="keyword">import</span> android.view.View;</span><br><span class="line"><span class="keyword">import</span> android.widget.Button;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.citrontek.FactoryTest.R;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.jetbrains.annotations.NotNull;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Camera_show</span> <span class="keyword">extends</span> <span class="title">Activity</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> Button btn_ok,btn_error;</span><br><span class="line">    <span class="keyword">private</span> SurfaceView surfaceView;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">static</span> String TAG=<span class="string">&quot;相机测试&quot;</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">boolean</span> isView;     <span class="comment">//判断相机是否正在预览</span></span><br><span class="line">    <span class="keyword">private</span> Camera camera;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState);</span><br><span class="line">        setContentView(R.layout.item_camera);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//初始化控件</span></span><br><span class="line">        initView();</span><br><span class="line"></span><br><span class="line">        <span class="comment">//先开始申请权限，无权限或者不给权限直接退出</span></span><br><span class="line">        <span class="keyword">if</span>(Camera_show.<span class="keyword">this</span>.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA))&#123;</span><br><span class="line">            <span class="keyword">if</span> (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.M) &#123;</span><br><span class="line">                <span class="comment">//无权限注册权限</span></span><br><span class="line">                <span class="keyword">if</span> (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) &#123;</span><br><span class="line">                    requestPermissions(<span class="keyword">new</span> String[] &#123;Manifest.permission.CAMERA&#125;, <span class="number">1</span>);</span><br><span class="line">                &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">                    <span class="comment">//android 6.0 版本以上，查询到拥有权限则直接开始预览展示</span></span><br><span class="line">                    Log.i(TAG, <span class="string">&quot;android 6.0版本以上有权限&quot;</span>);</span><br><span class="line">                    camera_Preview();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">                <span class="comment">//6.0版本以下，不用动态申请权限，如果查询到有此权限则 直接开始预览展示</span></span><br><span class="line">                Log.i(TAG, <span class="string">&quot;android 6.0版本以下有权限&quot;</span>);</span><br><span class="line">                camera_Preview();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">            <span class="comment">//无此模块直接弹出警告框退出</span></span><br><span class="line">            dialog_warning(<span class="string">&quot;此设备不支持相机，程序即将退出&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">initView</span><span class="params">()</span></span>&#123;</span><br><span class="line">        btn_error=findViewById(R.id.btn_error);</span><br><span class="line">        btn_ok=findViewById(R.id.btn_ok);</span><br><span class="line">        btn_ok.setOnClickListener(<span class="keyword">new</span> View.OnClickListener() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onClick</span><span class="params">(View v)</span> </span>&#123;</span><br><span class="line">                BackMain(<span class="number">1</span>);</span><br><span class="line">                finish();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">        btn_error.setOnClickListener(<span class="keyword">new</span> View.OnClickListener() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onClick</span><span class="params">(View v)</span> </span>&#123;</span><br><span class="line">                BackMain(-<span class="number">1</span>);</span><br><span class="line">                finish();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">        surfaceView=findViewById(R.id.camera_view);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//相机预览展示</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">camera_Preview</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(surfaceCallback!=<span class="keyword">null</span>)&#123;</span><br><span class="line">            <span class="comment">//开启相机连接，开始预览  ------注：0,1参数是指的前后摄像头，具体定义还需自己测试（一般0为后置，1为前置）</span></span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                camera = Camera.open(<span class="number">1</span>);</span><br><span class="line">                Log.i(TAG, <span class="string">&quot;onCreate:获取成功 &quot;</span>);</span><br><span class="line">                <span class="comment">//设置角度</span></span><br><span class="line">                setCameraDisplayOrientation(Camera_show.<span class="keyword">this</span>,<span class="number">0</span>,camera);</span><br><span class="line"></span><br><span class="line">                <span class="comment">//获取surfaceholder对象</span></span><br><span class="line">                SurfaceHolder surfaceHolder=surfaceView.getHolder();</span><br><span class="line"></span><br><span class="line">                <span class="comment">//设置surface格式</span></span><br><span class="line">                <span class="comment">//参数:系统支持的透明度样式 int类型 详见 PixelFormat类</span></span><br><span class="line">                surfaceHolder.setFormat(PixelFormat.TRANSPARENT);</span><br><span class="line">                <span class="comment">//设置callback返回接口</span></span><br><span class="line">                surfaceHolder.addCallback(surfaceCallback);</span><br><span class="line">                <span class="comment">//再次调用创建方法</span></span><br><span class="line">                surfaceCallback.surfaceCreated(surfaceHolder);</span><br><span class="line"></span><br><span class="line">            &#125;<span class="keyword">catch</span> (Exception e)&#123;</span><br><span class="line">                Log.i(TAG, <span class="string">&quot;onCreate:摄像头被占用或打开失败，请关闭其他相机程序后再进行尝试 &quot;</span>);</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> SurfaceHolder.Callback surfaceCallback=<span class="keyword">new</span> SurfaceHolder.Callback() &#123;</span><br><span class="line">        <span class="comment">//首次创建时</span></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">surfaceCreated</span><span class="params">(SurfaceHolder holder)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                camera.setPreviewDisplay(holder);<span class="comment">//通过SurfaceView显示取景画面</span></span><br><span class="line">            &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">            camera.startPreview();<span class="comment">//开始预览</span></span><br><span class="line">            isView = <span class="keyword">true</span>;<span class="comment">//设置是否预览参数为真</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//发生改变时</span></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">surfaceChanged</span><span class="params">(SurfaceHolder holder, <span class="keyword">int</span> format, <span class="keyword">int</span> width, <span class="keyword">int</span> height)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//销毁时</span></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">surfaceDestroyed</span><span class="params">(SurfaceHolder holder)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">if</span>(camera!=<span class="keyword">null</span>)&#123;</span><br><span class="line">                <span class="keyword">if</span>(isView)&#123; <span class="comment">//正在预览</span></span><br><span class="line">                    camera.stopPreview();</span><br><span class="line">                    camera.release();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">//设置相机角度</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">setCameraDisplayOrientation</span><span class="params">(Activity activity, <span class="keyword">int</span> cameraId, android.hardware.Camera camera)</span></span>&#123;</span><br><span class="line">        Camera.CameraInfo cameraInfo=<span class="keyword">new</span> Camera.CameraInfo();</span><br><span class="line">        <span class="comment">//获取摄像头信息</span></span><br><span class="line">        Camera.getCameraInfo(cameraId,cameraInfo);</span><br><span class="line">        <span class="keyword">int</span> rotation=activity.getWindowManager().getDefaultDisplay().getRotation();</span><br><span class="line">        <span class="keyword">int</span> degrees = <span class="number">0</span>;</span><br><span class="line">        <span class="comment">//获取的当前摄像头的角度</span></span><br><span class="line">        <span class="keyword">switch</span>(rotation)&#123;</span><br><span class="line">            <span class="keyword">case</span> Surface.ROTATION_0:</span><br><span class="line">                degrees=<span class="number">0</span>;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> Surface.ROTATION_90:</span><br><span class="line">                degrees=<span class="number">90</span>;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> Surface.ROTATION_180:</span><br><span class="line">                degrees=<span class="number">180</span>;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> Surface.ROTATION_270:</span><br><span class="line">                degrees=<span class="number">270</span>;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> result=<span class="number">0</span>;</span><br><span class="line">        <span class="keyword">if</span>(cameraInfo.facing==Camera.CameraInfo.CAMERA_FACING_FRONT)&#123;</span><br><span class="line">            <span class="comment">//前置摄像头</span></span><br><span class="line">            result=(cameraInfo.orientation+degrees)%<span class="number">360</span>;</span><br><span class="line">            result=(<span class="number">360</span>-result)%<span class="number">360</span>;</span><br><span class="line">        &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">            <span class="comment">//后置摄像头</span></span><br><span class="line">            result=(cameraInfo.orientation-degrees+<span class="number">360</span>)%<span class="number">360</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        camera.setDisplayOrientation(result);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">BackMain</span><span class="params">(<span class="keyword">int</span> code)</span></span>&#123;</span><br><span class="line">        Intent intent=<span class="keyword">new</span> Intent();</span><br><span class="line">        intent.putExtra(<span class="string">&quot;检测情况&quot;</span>,code);</span><br><span class="line">        setResult(RESULT_OK,intent);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//接收注册权限返回之后，重新申请相机权限并开始测试</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onRequestPermissionsResult</span><span class="params">(<span class="keyword">int</span> requestCode, <span class="meta">@NotNull</span> String[] permissions, <span class="meta">@NotNull</span> <span class="keyword">int</span>[] grantResults)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">switch</span> (requestCode) &#123;</span><br><span class="line">            <span class="keyword">case</span> <span class="number">1</span>: &#123;</span><br><span class="line">                <span class="comment">// If request is cancelled, the result arrays are empty.</span></span><br><span class="line">                <span class="keyword">if</span> (grantResults.length &gt; <span class="number">0</span> &amp;&amp; grantResults[<span class="number">0</span>] == PackageManager.PERMISSION_GRANTED) &#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">                    <span class="comment">// permission was granted, yay! Do the</span></span><br><span class="line">                    <span class="comment">// contacts-related task you need to do.</span></span><br><span class="line">                    Log.i(TAG, <span class="string">&quot;onRequestPermissionsResult: 权限申请通过了&quot;</span>);</span><br><span class="line"></span><br><span class="line">                    camera_Preview();</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    <span class="comment">//申请权限没有通过，弹出警告框，然后退出当前页面</span></span><br><span class="line">                    dialog_warning(<span class="string">&quot;没有通过照相机权限&quot;</span>);</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">default</span>:</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">dialog_warning</span><span class="params">(String msg_str)</span></span>&#123;</span><br><span class="line">        AlertDialog.Builder dialog=<span class="keyword">new</span> AlertDialog.Builder(Camera_show.<span class="keyword">this</span>);</span><br><span class="line">        dialog.setTitle(<span class="string">&quot;警告&quot;</span>);</span><br><span class="line">        dialog.setMessage(msg_str);</span><br><span class="line">        dialog.setCancelable(<span class="keyword">false</span>);</span><br><span class="line">        dialog.setPositiveButton(<span class="string">&quot;我知道了&quot;</span>, <span class="keyword">new</span> DialogInterface.OnClickListener() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onClick</span><span class="params">(DialogInterface dialog, <span class="keyword">int</span> which)</span> </span>&#123;</span><br><span class="line">                <span class="comment">//退出程序</span></span><br><span class="line">                finish();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">        dialog.show();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <categories>
+        <category>Android</category>
+      </categories>
+      <tags>
+        <tag>Android6.0</tag>
+        <tag>摄像头</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Builder模式</title>
+    <url>/2020/03/01/Builderg%CC%A7%CA%BD/</url>
+    <content><![CDATA[<p>自由拓展你的程序-建造者模式（Builder模式）</p>
+<p>一个复杂对象的构建与它的表示分离。使得同样的构建过程可以创建不同的表示。</p>
+<a id="more"></a>
+
+<h3 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h3><ol>
+<li>相同的方法，不同的执行顺序，产生不同的结果时。</li>
+<li>多个零件或者部件，都可以装配到一个对象中，但是产生的运行结果又不想同时。</li>
+<li>产品类非常复杂，或者产品类中的调用顺序不同产生了不同的作用，这个时候使用建造者模式就非常合适。</li>
+<li>当初始化一个对象特别复杂，例如参数多，且很多参数都有默认值时</li>
+</ol>
+<h3 id="简单实现"><a href="#简单实现" class="headerlink" title="简单实现"></a>简单实现</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//抽象类</span></span><br><span class="line"><span class="keyword">package</span> Builder;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">Computer</span> </span>&#123;</span><br><span class="line">    <span class="keyword">protected</span> String mBoard;</span><br><span class="line">    <span class="keyword">protected</span> String mDisplay;</span><br><span class="line">    <span class="keyword">protected</span> String mOS;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="title">Computer</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setBoard</span><span class="params">(String board)</span></span>&#123;</span><br><span class="line">        mBoard=board;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//设置内存</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setDisplay</span><span class="params">(String display)</span></span>&#123;</span><br><span class="line">        mDisplay=display;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//设置操作系统</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">setOS</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;Computer&#123;&quot;</span> +</span><br><span class="line">                <span class="string">&quot;mBoard=&#x27;&quot;</span> + mBoard + <span class="string">&#x27;\&#x27;&#x27;</span> +</span><br><span class="line">                <span class="string">&quot;, mDisplay=&#x27;&quot;</span> + mDisplay + <span class="string">&#x27;\&#x27;&#x27;</span> +</span><br><span class="line">                <span class="string">&quot;, mOS=&#x27;&quot;</span> + mOS + <span class="string">&#x27;\&#x27;&#x27;</span> +</span><br><span class="line">                <span class="string">&#x27;&#125;&#x27;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//Builder类</span></span><br><span class="line"><span class="keyword">package</span> Builder;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">Builder</span> </span>&#123;</span><br><span class="line">    <span class="comment">//设置主机</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">buildBoard</span><span class="params">(String board)</span></span>;</span><br><span class="line">    <span class="comment">//设置显示器</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">buildDisplay</span><span class="params">(String display)</span></span>;</span><br><span class="line">    <span class="comment">//设置操作系统</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">buildOS</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="comment">//创建computer</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> Computer <span class="title">create</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">package</span> Builder;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Director</span> </span>&#123;</span><br><span class="line">    Builder mBuilder=<span class="keyword">null</span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Director</span><span class="params">(Builder builder)</span></span>&#123;</span><br><span class="line">        mBuilder=builder;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">construct</span><span class="params">(String board,String display)</span></span>&#123;</span><br><span class="line">        mBuilder.buildBoard(board);</span><br><span class="line">        mBuilder.buildDisplay(display);</span><br><span class="line">        mBuilder.buildOS();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">package</span> Builder;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Macbook</span> <span class="keyword">extends</span> <span class="title">Computer</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Macbook</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setOS</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        mOS=<span class="string">&quot;MAC OS X 10.10&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">package</span> Builder;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MacbookBuilder</span> <span class="keyword">extends</span> <span class="title">Builder</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> Computer mComputer=<span class="keyword">new</span> Macbook();</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">buildBoard</span><span class="params">(String board)</span> </span>&#123;</span><br><span class="line">        mComputer.setBoard(board);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">buildDisplay</span><span class="params">(String display)</span> </span>&#123;</span><br><span class="line">        mComputer.setDisplay(display);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">buildOS</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        mComputer.setOS();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Computer <span class="title">create</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> mComputer;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//测试类</span></span><br><span class="line"><span class="keyword">package</span> Builder;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Builder builder=<span class="keyword">new</span> MacbookBuilder();</span><br><span class="line">        Director pcDirector=<span class="keyword">new</span> Director(builder);</span><br><span class="line">        pcDirector.construct(<span class="string">&quot;因特尔主板&quot;</span>,<span class="string">&quot;测试显示器&quot;</span>);</span><br><span class="line">        System.out.println(<span class="string">&quot;computer info :&quot;</span>+builder.create().toString());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>执行结果：</strong></p>
+<img src="/2020/03/01/Builderg%CC%A7%CA%BD/show.png" class="" title="执行结果">
+
+]]></content>
+      <categories>
+        <category>Android</category>
+      </categories>
+      <tags>
+        <tag>Android</tag>
+        <tag>编码规范</tag>
+        <tag>设计模式</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Git 右键菜单添加Git Bash Here</title>
+    <url>/2019/12/21/Git-%E5%8F%B3%E9%94%AE%E8%8F%9C%E5%8D%95%E6%B7%BB%E5%8A%A0Git-Bash-Here/</url>
+    <content><![CDATA[<p>通过修改注册表的方式添加右键菜单  Git Bash Here</p>
+<a id="more"></a>
+
+<p>安装完git发现没有右键菜单,网上找了资料,发现都是通过修改注册表的方式来添加的.所以特此记录下.</p>
+<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><ol>
+<li>WIN+R 打开运行窗口,输入regedit打开注册表</li>
+<li>查找HEKY_CLASS_ROOT/Directory/Background/shell</li>
+<li>shell上右键新建&gt;项 ,更改项名称为git_shell</li>
+<li>点击git_shell,修改右侧的默认数据为Git Bash Here</li>
+<li>空白处右击&gt;新建&gt;字符串值,名称为:Icon,数据为Git安装目录下的git-bash.exe</li>
+<li>点击git_shell,右键&gt;新建&gt;项,修改项名称为command</li>
+<li>同样,在command项右侧修改默认数据为Git安装目录下的git-bash.exe</li>
+</ol>
+<h2 id="最终效果"><a href="#最终效果" class="headerlink" title="最终效果"></a>最终效果</h2><img src="/2019/12/21/Git-%E5%8F%B3%E9%94%AE%E8%8F%9C%E5%8D%95%E6%B7%BB%E5%8A%A0Git-Bash-Here/git_shell.jpg" class="" title="git_shell注册表">
+
+
+
+<img src="/2019/12/21/Git-%E5%8F%B3%E9%94%AE%E8%8F%9C%E5%8D%95%E6%B7%BB%E5%8A%A0Git-Bash-Here/command.jpg" class="" title="command注册表">
+
+
+
+<img src="/2019/12/21/Git-%E5%8F%B3%E9%94%AE%E8%8F%9C%E5%8D%95%E6%B7%BB%E5%8A%A0Git-Bash-Here/menu.jpg" class="" title="右键菜单效果">]]></content>
+      <categories>
+        <category>Git使用</category>
+      </categories>
+      <tags>
+        <tag>注册表</tag>
+        <tag>右键菜单</tag>
+        <tag>Windows</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Hexo语法记录</title>
+    <url>/2019/07/15/Hexo%E8%AF%AD%E6%B3%95%E8%AE%B0%E5%BD%95/</url>
+    <content><![CDATA[<p>平常使用Hexo博客框架时所用到的语法，随时更新</p>
+<a id="more"></a>
+
+<h1 id="Hexo相关语法"><a href="#Hexo相关语法" class="headerlink" title="Hexo相关语法"></a>Hexo相关语法</h1><p>部署Hexo框架请参考 <a href="https://hexo.io/zh-cn/docs/index.html">官方文档</a></p>
+<p>我这里部署的是git+node.js+git.io的方式</p>
+<h2 id="创建新博客文章"><a href="#创建新博客文章" class="headerlink" title="创建新博客文章"></a>创建新博客文章</h2><p>在Hexo目录打开命令行，输入：<strong>hexo new “博客文章名字”</strong> 即可创建新博客文章</p>
+<h2 id="将博客渲染成静态html文件"><a href="#将博客渲染成静态html文件" class="headerlink" title="将博客渲染成静态html文件"></a>将博客渲染成静态html文件</h2><p>Hexo目录打开命令行 ，输入：<strong>hexo generate （也可以简写 hexo g）</strong>即可生成静态文件</p>
+<h2 id="部署博客"><a href="#部署博客" class="headerlink" title="部署博客"></a>部署博客</h2><p>Hexo目录打开命令行，输入： <strong>hexo deploy （也可以简写成 hexo d）</strong>即可生成</p>
+]]></content>
+      <categories>
+        <category>博客相关</category>
+      </categories>
+      <tags>
+        <tag>博客，语法</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>K均值-聚类算法</title>
+    <url>/2020/01/05/K%E5%9D%87%E5%80%BC-%E8%81%9A%E7%B1%BB%E7%AE%97%E6%B3%95/</url>
+    <content><![CDATA[<p>K均值算法（聚类算法），此处使用的是最简单的一维数组，可用于图像二值化计算。</p>
+<p>由于第一次用，有些地方理解还不深。</p>
+<a id="more"></a>
+
+<h1 id="算法应用"><a href="#算法应用" class="headerlink" title="算法应用"></a>算法应用</h1><p>此处我们应用在图像二值化处理方面</p>
+<h2 id="相关名词解释"><a href="#相关名词解释" class="headerlink" title="相关名词解释"></a>相关名词解释</h2><p><strong>质心</strong>：每个簇中最中心的点</p>
+<p><strong>簇</strong>：每个质心组所包含的点</p>
+<p><strong>K值</strong>：最终分成K个簇</p>
+<h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><ol>
+<li>根据K值计算初始质心为K个模拟质心</li>
+<li>遍历每个点，计算与质心的距离，并将距离最短的质心分为一个簇</li>
+<li>重新计算每个簇的质心</li>
+<li>重新进行第2步骤直到2次结果相同 (注意：有时可能会出现2次结果一直不相同的情况，这时候就要酌情计算)</li>
+</ol>
+<h2 id="二值化原理"><a href="#二值化原理" class="headerlink" title="二值化原理"></a>二值化原理</h2><p><strong>颜色组成是ARGB构成（0~255）</strong></p>
+<ol>
+<li>彩图RGB值都不相同</li>
+<li>灰度图RGN值相同</li>
+<li>二值化图RGB只有2个值</li>
+</ol>
+<p><strong>彩图转灰度图</strong>:</p>
+<p>​    (R+G+B)/3</p>
+<p><strong>灰度图转二值化</strong>：</p>
+<p>​    通过此算法计算出一个锚点，每个像素点跟锚点比较，大于为白色，小于为黑色</p>
+<h2 id="实例代码"><a href="#实例代码" class="headerlink" title="实例代码"></a>实例代码</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> com.img2binarization;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> android.graphics.Bitmap;</span><br><span class="line"><span class="keyword">import</span> android.graphics.Color;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.Collections;</span><br><span class="line"><span class="keyword">import</span> java.util.Iterator;</span><br><span class="line"><span class="keyword">import</span> java.util.LinkedList;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ImgUtil</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">static</span> String TAG=<span class="string">&quot;ImgUtil&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Bitmap <span class="title">img2gray</span><span class="params">(Bitmap bitmap)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> sRow; <span class="comment">//Row--height</span></span><br><span class="line">        <span class="keyword">int</span> sCol; <span class="comment">//col--width</span></span><br><span class="line">        <span class="keyword">int</span> sPixel = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">int</span> sIndex= <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">int</span> sWidth = bitmap.getWidth();</span><br><span class="line">        <span class="keyword">int</span> sHeight = bitmap.getHeight();</span><br><span class="line">        <span class="keyword">int</span>[] sPixels = <span class="keyword">new</span> <span class="keyword">int</span>[sWidth * sHeight];</span><br><span class="line">        bitmap.getPixels(sPixels, <span class="number">0</span>, sWidth, <span class="number">0</span>, <span class="number">0</span>, sWidth, sHeight);</span><br><span class="line">        <span class="keyword">for</span> (sRow = <span class="number">0</span>; sRow &lt; sHeight; sRow++) &#123;</span><br><span class="line">            sIndex = sRow * sWidth;</span><br><span class="line">            <span class="keyword">for</span> (sCol = <span class="number">0</span>; sCol &lt; sWidth; sCol++) &#123;</span><br><span class="line">                sPixel = sPixels[sIndex];</span><br><span class="line">                <span class="keyword">int</span> a = (sPixel &gt;&gt; <span class="number">24</span>) &amp; <span class="number">0xff</span>;</span><br><span class="line">                <span class="keyword">int</span> r = (sPixel &gt;&gt; <span class="number">16</span>) &amp; <span class="number">0xff</span>;</span><br><span class="line">                <span class="keyword">int</span> g = (sPixel &gt;&gt; <span class="number">8</span>) &amp; <span class="number">0xff</span>;</span><br><span class="line">                <span class="keyword">int</span> b = sPixel &amp; <span class="number">0xff</span>;</span><br><span class="line">                <span class="keyword">int</span> sum=r+g+b;</span><br><span class="line">                r=g=b=sum/<span class="number">3</span>;</span><br><span class="line">                sPixel = ((a &amp; <span class="number">0xff</span>) &lt;&lt; <span class="number">24</span> | (r &amp; <span class="number">0xff</span>) &lt;&lt; <span class="number">16</span> | (g &amp; <span class="number">0xff</span>) &lt;&lt; <span class="number">8</span> | b &amp; <span class="number">0xff</span>);</span><br><span class="line">                sPixels[sIndex] = sPixel;</span><br><span class="line">                sIndex++;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        bitmap.setPixels(sPixels, <span class="number">0</span>, sWidth, <span class="number">0</span>, <span class="number">0</span>, sWidth, sHeight);</span><br><span class="line">        <span class="keyword">return</span> bitmap;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Bitmap <span class="title">img2binarization</span><span class="params">(Bitmap bitmap)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(bitmap==<span class="keyword">null</span>)&#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//获取图像宽高，取2个随机点</span></span><br><span class="line">        <span class="keyword">int</span> width=bitmap.getWidth();</span><br><span class="line">        <span class="keyword">int</span> height=bitmap.getHeight();</span><br><span class="line">        <span class="keyword">int</span> flagW=<span class="number">255</span>;</span><br><span class="line">        <span class="keyword">int</span> flagB=<span class="number">0</span>;</span><br><span class="line">        <span class="keyword">int</span> sumW=<span class="number">0</span>;</span><br><span class="line">        <span class="keyword">int</span> sumB=<span class="number">0</span>;</span><br><span class="line">        <span class="keyword">int</span> lenW=<span class="number">0</span>;</span><br><span class="line">        <span class="keyword">int</span> lenB=<span class="number">0</span>;</span><br><span class="line">        <span class="keyword">boolean</span> isEnd=<span class="keyword">false</span>;</span><br><span class="line">        LinkedList&lt;Integer&gt; linkedListW=<span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line">        LinkedList&lt;Integer&gt; linkedListB=<span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line">        <span class="comment">//bitmap 转换数组</span></span><br><span class="line">        <span class="keyword">int</span>[] sPixels = <span class="keyword">new</span> <span class="keyword">int</span>[width * height];</span><br><span class="line">        bitmap.getPixels(sPixels, <span class="number">0</span>, width, <span class="number">0</span>, <span class="number">0</span>, width, height);</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; sPixels.length; i++) &#123;</span><br><span class="line">            <span class="keyword">int</span> a = (sPixels[i] &gt;&gt; <span class="number">24</span>) &amp; <span class="number">0xff</span>;</span><br><span class="line">            <span class="keyword">int</span> r = (sPixels[i] &gt;&gt; <span class="number">16</span>) &amp; <span class="number">0xff</span>;</span><br><span class="line">            <span class="keyword">int</span> g = (sPixels[i] &gt;&gt; <span class="number">8</span>) &amp; <span class="number">0xff</span>;</span><br><span class="line">            <span class="keyword">int</span> b = sPixels[i] &amp; <span class="number">0xff</span>;</span><br><span class="line">            <span class="keyword">if</span>(r==g&amp;&amp;g==b)&#123;</span><br><span class="line">                sPixels[i]=r;</span><br><span class="line">            &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">                sPixels[i]=(r+g+b)/<span class="number">3</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span>(Math.abs(sPixels[i]-flagW)&lt;Math.abs(sPixels[i]-flagB))&#123;</span><br><span class="line">                linkedListW.add(sPixels[i]);</span><br><span class="line">                sumW+=sPixels[i];</span><br><span class="line">            &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">                linkedListB.add(sPixels[i]);</span><br><span class="line">                sumB+=sPixels[i];</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        lenW=linkedListW.size();</span><br><span class="line">        lenB=linkedListB.size();</span><br><span class="line">        <span class="comment">//循环取点、分组，直到连续2次相同</span></span><br><span class="line">        <span class="keyword">if</span>(lenW!=<span class="number">0</span>&amp;&amp;lenB!=<span class="number">0</span>)&#123;</span><br><span class="line">            flagW=sumW/lenW;</span><br><span class="line">            flagB=sumB/lenB;</span><br><span class="line">        &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">            <span class="keyword">if</span>(lenW==<span class="number">0</span>&amp;&amp;lenB==<span class="number">0</span>)&#123;</span><br><span class="line">                flagW=<span class="number">255</span>;</span><br><span class="line">                flagB=<span class="number">0</span>;</span><br><span class="line">            &#125;<span class="keyword">else</span> <span class="keyword">if</span>(lenW==<span class="number">0</span>)&#123;</span><br><span class="line">                flagW=<span class="number">255</span>;</span><br><span class="line">                flagB=sumB/lenB;</span><br><span class="line">            &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">                flagB=<span class="number">0</span>;</span><br><span class="line">                flagW=sumW/lenW;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">while</span>(!isEnd)&#123;</span><br><span class="line">            <span class="comment">//再次分组</span></span><br><span class="line">            Iterator&lt;Integer&gt; iterator1=linkedListW.iterator();</span><br><span class="line">            <span class="keyword">while</span>(iterator1.hasNext())&#123;</span><br><span class="line">                <span class="keyword">int</span> pixel=iterator1.next();</span><br><span class="line">                <span class="keyword">if</span>(Math.abs(pixel-flagW)&gt;Math.abs(pixel-flagB))&#123;</span><br><span class="line">                    iterator1.remove();</span><br><span class="line">                    linkedListB.add(pixel);</span><br><span class="line">                    sumW-=pixel;</span><br><span class="line">                    sumB+=pixel;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            Iterator&lt;Integer&gt; iterator2=linkedListB.iterator();</span><br><span class="line">            <span class="keyword">while</span>(iterator2.hasNext())&#123;</span><br><span class="line">                <span class="keyword">int</span> pixel=iterator2.next();</span><br><span class="line">                <span class="keyword">if</span>(Math.abs(pixel-flagW)&lt;Math.abs(pixel-flagB))&#123;</span><br><span class="line">                    iterator2.remove();</span><br><span class="line">                    linkedListW.add(pixel);</span><br><span class="line">                    sumW+=pixel;</span><br><span class="line">                    sumB-=pixel;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            lenW=linkedListW.size();</span><br><span class="line">            lenB=linkedListB.size();</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span>(lenW!=<span class="number">0</span>&amp;&amp;lenB!=<span class="number">0</span>)&#123;</span><br><span class="line">                <span class="keyword">if</span>(flagW==sumW/lenW&amp;&amp;flagB==sumB/lenB)&#123;</span><br><span class="line">                    isEnd=<span class="keyword">true</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                flagW=sumW/lenW;</span><br><span class="line">                flagB=sumB/lenB;</span><br><span class="line">            &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">                <span class="keyword">if</span>(lenW==<span class="number">0</span>&amp;&amp;lenB==<span class="number">0</span>)&#123;</span><br><span class="line">                    flagW=<span class="number">255</span>;</span><br><span class="line">                    flagB=<span class="number">0</span>;</span><br><span class="line">                &#125;<span class="keyword">else</span> <span class="keyword">if</span>(lenW==<span class="number">0</span>)&#123;</span><br><span class="line">                    flagW=sumB/lenB;</span><br><span class="line">                    flagB=<span class="number">0</span>;</span><br><span class="line">                &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">                    flagB=sumW/lenW;</span><br><span class="line">                    flagW=<span class="number">255</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        Collections.sort(linkedListB);</span><br><span class="line">        <span class="keyword">int</span> anchorPoint=linkedListB.getLast();</span><br><span class="line">        <span class="comment">//图像二值化处理</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; sPixels.length; i++) &#123;</span><br><span class="line">            <span class="keyword">if</span>(sPixels[i]&gt;anchorPoint)&#123;</span><br><span class="line">                sPixels[i] = Color.WHITE;</span><br><span class="line">            &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">                sPixels[i] = Color.BLACK;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        bitmap.setPixels(sPixels, <span class="number">0</span>, width, <span class="number">0</span>, <span class="number">0</span>, width, height);</span><br><span class="line">        <span class="comment">//返回图像</span></span><br><span class="line">        <span class="keyword">return</span> bitmap;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="运行效果"><a href="#运行效果" class="headerlink" title="运行效果"></a>运行效果</h2><p><strong>原图</strong></p>
+<img src="/2020/01/05/K%E5%9D%87%E5%80%BC-%E8%81%9A%E7%B1%BB%E7%AE%97%E6%B3%95/111.png" class="" title="**原图**">
+
+
+
+<p><strong>灰度图</strong></p>
+<img src="/2020/01/05/K%E5%9D%87%E5%80%BC-%E8%81%9A%E7%B1%BB%E7%AE%97%E6%B3%95/222.png" class="" title="**灰度图**">
+
+
+
+<p><strong>二值化图</strong></p>
+<img src="/2020/01/05/K%E5%9D%87%E5%80%BC-%E8%81%9A%E7%B1%BB%E7%AE%97%E6%B3%95/333.png" class="" title="二值化图">]]></content>
+      <categories>
+        <category>算法</category>
+      </categories>
+      <tags>
+        <tag>算法</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>SS搭建+BBR加速</title>
+    <url>/2019/10/30/SS%E6%90%AD%E5%BB%BA-BBR%E5%8A%A0%E9%80%9F/</url>
+    <content><![CDATA[<p>使用VPS服务器搭建ShadowSocks，并使用Google BBR进行加速</p>
+<a id="more"></a>
+
+
+
+<h2 id="开始前准备"><a href="#开始前准备" class="headerlink" title="开始前准备"></a>开始前准备</h2><ol>
+<li>海外VPS服务器（此博客使用的是美国洛杉矶服务器，centOS 7*64 系统）</li>
+<li>SSH连接工具（putty/xshell都行）</li>
+</ol>
+<h2 id="搭建ShadowSocks服务端"><a href="#搭建ShadowSocks服务端" class="headerlink" title="搭建ShadowSocks服务端"></a>搭建ShadowSocks服务端</h2><p><strong>运行以下安装脚本（自动安装）</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">wget --no-check-certificate -O shadowsocks.sh https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;teddysun&#x2F;shadowsocks_install&#x2F;master&#x2F;shadowsocks.sh</span><br><span class="line">chmod +x shadowsocks.sh</span><br><span class="line">.&#x2F;shadowsocks.sh 2&gt;&amp;1 | tee shadowsocks.log</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>根据提示进行操作</strong></p>
+<p>提示设置的顺序为：</p>
+<img src="/2019/10/30/SS%E6%90%AD%E5%BB%BA-BBR%E5%8A%A0%E9%80%9F/ShadowSocks1.jpg" class="" title="连接密码">
+
+<img src="/2019/10/30/SS%E6%90%AD%E5%BB%BA-BBR%E5%8A%A0%E9%80%9F/ShadowSocks2.jpg" class="" title="连接端口">
+
+<img src="/2019/10/30/SS%E6%90%AD%E5%BB%BA-BBR%E5%8A%A0%E9%80%9F/ShadowSocks3.jpg" class="" title="加密方式">
+
+<img src="/2019/10/30/SS%E6%90%AD%E5%BB%BA-BBR%E5%8A%A0%E9%80%9F/ShadowSocks4.jpg" class="" title="任意键以继续安装">
+
+
+
+<h2 id="安装Google-BBR加速"><a href="#安装Google-BBR加速" class="headerlink" title="安装Google BBR加速"></a>安装Google BBR加速</h2><p><strong>运行以下安装脚本</strong> </p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">wget --no-check-certificate https:&#x2F;&#x2F;github.com&#x2F;teddysun&#x2F;across&#x2F;raw&#x2F;master&#x2F;bbr.sh &amp;&amp; chmod +x bbr.sh &amp;&amp; .&#x2F;bbr.sh</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>安装最后会提示是否重启</strong>（提示信息：Do you want to Restart System? [y/N]）</p>
+<p>如果没有自动重启请手动重启VPS服务器</p>
+<p><strong>检测是否安装成功</strong></p>
+<p>重启后运行命令 uname -r </p>
+<img src="/2019/10/30/SS%E6%90%AD%E5%BB%BA-BBR%E5%8A%A0%E9%80%9F/ShadowSocks5.jpg" class="" title="提示以下信息说明安装成功">
+
+<h2 id="ShadowSocks-多用户配置"><a href="#ShadowSocks-多用户配置" class="headerlink" title="ShadowSocks 多用户配置"></a>ShadowSocks 多用户配置</h2><p>已成功安装ShadowSocks服务端后，使用VI编辑器打开配置文件（ vi  /etc/shadowsocks.json ）</p>
+<p>修改为以下内容：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#123;     </span><br><span class="line">&quot;server&quot;:&quot;服务器IP地址&quot;,</span><br><span class="line">&quot;local_address&quot;: &quot;127.0.0.1&quot;,    </span><br><span class="line">&quot;local_port&quot;:1080,    </span><br><span class="line">&quot;port_password&quot;: </span><br><span class="line">&#123;          </span><br><span class="line">    &quot;端口号1&quot;: &quot;密码1&quot;,</span><br><span class="line">    &quot;端口号2&quot;: &quot;密码2&quot;</span><br><span class="line">&#125;,     </span><br><span class="line">&quot;timeout&quot;:300,    </span><br><span class="line">&quot;method&quot;:&quot;aes-256-gcm&quot;,     </span><br><span class="line">&quot;fast_open&quot;: false</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>重启ShadowSocks服务即可（ ssserver -c /etc/shadowsocks.json -d restart ）</p>
+<h2 id="更新"><a href="#更新" class="headerlink" title="更新"></a>更新</h2><p>2020年4月19日16:48:22：疫情原因，墙又高了，现在新IP基本上3分钟端口就封了。已改用付费VPN</p>
+]]></content>
+      <categories>
+        <category>ShadowSocks</category>
+      </categories>
+      <tags>
+        <tag>服务器，加速</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>状态模式</title>
+    <url>/2020/04/19/%D7%B4%CC%ACg%CC%A7%CA%BD/</url>
+    <content><![CDATA[<p>随遇而安-状态模式</p>
+<a id="more"></a>
+
+<h2 id="模式简介"><a href="#模式简介" class="headerlink" title="模式简介"></a>模式简介</h2><p>当一个对象内在状态改变时允许改变其行为，这个对象看起来像是改变了其类</p>
+<h2 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h2><ul>
+<li>一个对象的行为取决于它的状态，并且它必须在运行时根据状态改变它的行为</li>
+<li>代码中包含大量与对象状态有关的条件语句，例如：一个操作中含有庞大的多分支语句（if-else   switch-case），且这些分支依赖于该对象的状态</li>
+</ul>
+<p>状态模式将每一个条件分支放入一个独立的类中，这使得你可以根据对象自身的情况将对象的状态作为一个对象，这个对象可以不依赖与其他对象而独立变化，这样通过多态来去除过多的重复的if-else等分支语句。</p>
+<h2 id="简单实现"><a href="#简单实现" class="headerlink" title="简单实现"></a>简单实现</h2><p>以电视遥控器为例子</p>
+<p><strong>电视状态接口</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">public interface TvState &#123;</span><br><span class="line">    public void nextChannel();</span><br><span class="line">    public void prevChannel();</span><br><span class="line">    public void turnUp();</span><br><span class="line">    public void turnDown();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>关机状态</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">public class PowerOffState implements TvState &#123;</span><br><span class="line">    public void nextChannel() &#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void prevChannel() &#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void turnUp() &#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void turnDown() &#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>开机状态</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">public class PowerOnState implements TvState &#123;</span><br><span class="line">    public void nextChannel() &#123;</span><br><span class="line">        System.out.println(&quot;下一频道&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void prevChannel() &#123;</span><br><span class="line"></span><br><span class="line">        System.out.println(&quot;上一频道&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void turnUp() &#123;</span><br><span class="line"></span><br><span class="line">        System.out.println(&quot;提高音量&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void turnDown() &#123;</span><br><span class="line"></span><br><span class="line">        System.out.println(&quot;降低音量&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>电源操作接口</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">public interface PowerController &#123;</span><br><span class="line">    public void powerOn();</span><br><span class="line">    public void powerOff();</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>电视遥控器</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">public class TvController implements PowerController &#123;</span><br><span class="line">    private TvState tvState;</span><br><span class="line">    public void setTvState(TvState tvState)&#123;</span><br><span class="line">        this.tvState&#x3D;tvState;</span><br><span class="line">    &#125;</span><br><span class="line">    public void powerOn() &#123;</span><br><span class="line">        setTvState(new PowerOnState());</span><br><span class="line">        System.out.println(&quot;开机了&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void powerOff() &#123;</span><br><span class="line">        setTvState(new PowerOffState());</span><br><span class="line">        System.out.println(&quot;关机了&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">    public void nextChannel()&#123;</span><br><span class="line">        tvState.nextChannel();</span><br><span class="line">    &#125;</span><br><span class="line">    public void prevChannel()&#123;</span><br><span class="line">        tvState.prevChannel();</span><br><span class="line">    &#125;</span><br><span class="line">    public void turnUp()&#123;</span><br><span class="line">        tvState.turnUp();</span><br><span class="line">    &#125;</span><br><span class="line">    public void turnDown()&#123;</span><br><span class="line">        tvState.turnDown();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>客户端调用</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">public class Client &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        TvController tvController&#x3D;new TvController();</span><br><span class="line">        tvController.powerOn();</span><br><span class="line">        tvController.nextChannel();</span><br><span class="line">        tvController.prevChannel();</span><br><span class="line">        tvController.turnUp();</span><br><span class="line">        tvController.powerOff();</span><br><span class="line">        tvController.turnUp();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>执行结果</strong></p>
+<img src="/2020/04/19/%D7%B4%CC%ACg%CC%A7%CA%BD/stateMode.png" class="" title="执行结果">
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>  不同状态下对于同一行为有不同的相应，这其实就是一个将if-else用多态来实现的一个具体示例</p>
+<p><strong>优点</strong></p>
+<p>​    模式将所有与一个特定状态相关的行为都放入在一个状态对象中，它提供了一个更好的方法来组织与特定状态相关的代码，将繁琐的状态判断转换成结构清晰的状态类簇，在避免代码膨胀的同时也保证了可扩展性与可维护性</p>
+<p><strong>缺点</strong></p>
+<p>​    模式的使用必然会增加系统类和对象的个数</p>
+]]></content>
+      <categories>
+        <category>Android</category>
+      </categories>
+      <tags>
+        <tag>Android</tag>
+        <tag>编码规范</tag>
+        <tag>设计模式</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>博客说明</title>
+    <url>/2019/06/05/%E5%8D%9A%E5%AE%A2%E8%AF%B4%E6%98%8E/</url>
+    <content><![CDATA[<p>开始工作也一年了，平时也没有做些日志记录，感觉现在什么都不会，比较焦虑。</p>
+<p>所以特意搭建了这个博客，希望以此能激励自己在平时的时候做些技术积累。</p>
+<a id="more"></a>
+
+<h2 id="博客说明"><a href="#博客说明" class="headerlink" title="博客说明"></a>博客说明</h2><p>此博客会把平时工作中遇到的问题和技术新的写到上面</p>
+]]></content>
+      <categories>
+        <category>心得体会</category>
+      </categories>
+      <tags>
+        <tag>随笔</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>单例模式</title>
+    <url>/2019/09/09/%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/</url>
+    <content><![CDATA[<p>最常用模式：单例模式</p>
+<a id="more"></a>
+
+<h1 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h1><h2 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h2><p>确保某一个类中只有一个实例，并且自行实例化并向整个系统提供这个实例</p>
+<h2 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h2><p>确保某一个类有且只有一个对象的应用场景、</p>
+<h2 id="关键点"><a href="#关键点" class="headerlink" title="关键点"></a>关键点</h2><ol>
+<li>构造函数不对外开放，并且一般为private</li>
+<li>通过一个静态方法或者枚举返回单例类对象</li>
+<li>确保单例累的对象有且只有一个，尤其是在多线程的情况下</li>
+<li>确保单例类对象在反序列化时不会重新构造对象</li>
+</ol>
+<h1 id="代码示例"><a href="#代码示例" class="headerlink" title="代码示例"></a>代码示例</h1><h2 id="饿汉单例模式"><a href="#饿汉单例模式" class="headerlink" title="饿汉单例模式"></a>饿汉单例模式</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//CEO ,饿汉单例模式</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CEO</span> <span class="keyword">extends</span> <span class="title">Staff</span></span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> CEO mCeo=<span class="keyword">new</span> CEO();</span><br><span class="line">    <span class="comment">//构造函数私有</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="title">CEO</span><span class="params">()</span></span>&#123;</span><br><span class="line">        </span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//公有的静态函数，向外暴露获取单例模式的接口</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> CEO <span class="title">getCeo</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> mCeo;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="懒汉式单例模式"><a href="#懒汉式单例模式" class="headerlink" title="懒汉式单例模式"></a>懒汉式单例模式</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F;懒汉单例模式</span><br><span class="line">public class Singleton&#123;</span><br><span class="line">    private static Singleton mSingleton&#x3D;null;</span><br><span class="line">    &#x2F;&#x2F;私有化构造方法</span><br><span class="line">    private Singleton()&#123;</span><br><span class="line">    </span><br><span class="line">    &#125;</span><br><span class="line">    public static synchronaized Singleton getSingleton()&#123;</span><br><span class="line">        if(mSingleton&#x3D;&#x3D;null)&#123;</span><br><span class="line">            mSingleton&#x3D;new Singleton();</span><br><span class="line">        &#125;</span><br><span class="line">        return mSingleton;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="懒汉式、饿汉式区别"><a href="#懒汉式、饿汉式区别" class="headerlink" title="懒汉式、饿汉式区别"></a>懒汉式、饿汉式区别</h2><p>懒汉式：首次获取时才会初始化对象，会稍慢且每次都需同步控制，浪费资源</p>
+<p>饿汉式：声明静态对象的时候就已经初始化</p>
+<h1 id="其他实现方式"><a href="#其他实现方式" class="headerlink" title="其他实现方式"></a>其他实现方式</h1><h2 id="Double-Check-Lock-DCL-实现单例"><a href="#Double-Check-Lock-DCL-实现单例" class="headerlink" title="Double Check Lock(DCL)实现单例"></a>Double Check Lock(DCL)实现单例</h2><p>特点：既能在需要时初始化实例，又能保证线程安全，且单例实例化之后再次调用无需同步锁</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">public class Singleton&#123;</span><br><span class="line">    &#x2F;&#x2F;此处volatile关键字是为了保证线程安全，volatile关键字在JDK1.5后才有，使用时请注意</span><br><span class="line">    private volatile static Singleton mSingleton&#x3D;null;</span><br><span class="line">    &#x2F;&#x2F;私有构造</span><br><span class="line">    private Singleton()&#123;</span><br><span class="line">    </span><br><span class="line">    &#125;</span><br><span class="line">    &#x2F;&#x2F;获取实例接口</span><br><span class="line">    public static Singleton getSingleton()&#123;</span><br><span class="line">        if(mSingleton&#x3D;&#x3D;null)&#123;</span><br><span class="line">            synchronized(Singletong.class)&#123;</span><br><span class="line">                if(mSingleton&#x3D;&#x3D;null)&#123;</span><br><span class="line">                    mSingleton&#x3D;new Singleton();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        return mSingleton;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>解析：第一层判断，避免不必要的同步；第二层判断，为了在null的情况下实例化对象</p>
+<h2 id="枚举单例"><a href="#枚举单例" class="headerlink" title="枚举单例"></a>枚举单例</h2><p><strong>优点：</strong></p>
+<ol>
+<li>由于单例模式在内存中只有一个实例，减少内存开支，特别是一个对象需要频繁的创建销毁时，而且创建或销毁时性能又无法优化，单例模式的优势就非常明显</li>
+<li>由于单例模式只生成一个实例，所以，减少了系统性能的开销，当一个对象的产生需要比较多的资源时，如读取配置，产生其他依赖对象时，则可以通过在应用启动时直接产生一个单例对象，然后用永久驻留内存的方式来解决</li>
+<li>单例模式可以避免对资源的多重占用，例如一个写文件操作，由于只有一个实例存在内存中，避免对同一个资源文件的同时写操作</li>
+<li>单例模式可以在系统设置全局的访问点，优化和共享资源访问，例如，可以设计一个单例类，负责所有数据表的映射处理</li>
+</ol>
+<p><strong>缺点：</strong></p>
+<ol>
+<li>单例模式一般没有借口，拓展很困难，若要拓展，除了修改代码基本上没有第二种途径可以实现</li>
+<li><strong>单例对象如果只有context，那么很容易引发内存泄露</strong>，此时需要注意传递给单例对象的Context最好是Application Context</li>
+</ol>
+]]></content>
+      <categories>
+        <category>Android</category>
+      </categories>
+      <tags>
+        <tag>Android</tag>
+        <tag>编码规范</tag>
+        <tag>设计模式</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>命令模式</title>
+    <url>/2020/05/21/%E5%91%BD%E4%BB%A4%E6%A8%A1%E5%BC%8F/</url>
+    <content><![CDATA[<p>让程序通畅运行-命令模式</p>
+<a id="more"></a>
+
+<h2 id="模式简介"><a href="#模式简介" class="headerlink" title="模式简介"></a>模式简介</h2><p>定义：将一个请求封装成一个对象，从而让用户使用不同的请求把客户端参数化：对请求排队或者记录请求日志，以及支持可撤销操作</p>
+<h2 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h2><p>需要抽象出等待执行的动作，然后以参数的形式提供出来–类似于过程设计中的回调机制，而命令模式正是回调机制的一个面向对象的替代品。</p>
+<p>在不同的时刻指定、排列和执行请求。一个命令对象可以有与出事请求无关的生存期。</p>
+<p>需要支持取消操作</p>
+<p>支持修改日志功能，这样当系统崩溃时，这些修改可以被重做一遍</p>
+<p>需要支持事务操作</p>
+<h2 id="简单实现"><a href="#简单实现" class="headerlink" title="简单实现"></a>简单实现</h2><p><strong>接收者角色 俄罗斯方块游戏</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package CommandMode;</span><br><span class="line"></span><br><span class="line">public class TetrisMachine &#123;</span><br><span class="line">    public void toLeft()&#123;</span><br><span class="line">        System.out.println(&quot;向左&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void toRight()&#123;</span><br><span class="line">        System.out.println(&quot;向右&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void fastToBottom()&#123;</span><br><span class="line">        System.out.println(&quot;快速落下&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void transfrom()&#123;</span><br><span class="line">        System.out.println(&quot;改变形状&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>命令者抽象 定义执行方法</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package CommandMode;</span><br><span class="line"></span><br><span class="line">public interface Command &#123;</span><br><span class="line">    void execute();</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>具体命令者 向左移命令</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package CommandMode;</span><br><span class="line"></span><br><span class="line">public class LeftCommand implements Command &#123;</span><br><span class="line">    private TetrisMachine tetrisMachine;</span><br><span class="line">    public LeftCommand(TetrisMachine tetrisMachine)&#123;</span><br><span class="line">        this.tetrisMachine&#x3D;tetrisMachine;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void execute() &#123;</span><br><span class="line">        tetrisMachine.toLeft();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>具体命令者 向右移命令</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package CommandMode;</span><br><span class="line"></span><br><span class="line">public class RightCommand implements Command &#123;</span><br><span class="line">    private TetrisMachine tetrisMachine;</span><br><span class="line"></span><br><span class="line">    public RightCommand(TetrisMachine tetrisMachine) &#123;</span><br><span class="line">        this.tetrisMachine &#x3D; tetrisMachine;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void execute() &#123;</span><br><span class="line">        tetrisMachine.toRight();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>具体命令者 快速落下的命令类</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package CommandMode;</span><br><span class="line"></span><br><span class="line">public class FallCommand implements Command &#123;</span><br><span class="line">    private TetrisMachine machine;</span><br><span class="line"></span><br><span class="line">    public FallCommand(TetrisMachine machine) &#123;</span><br><span class="line">        this.machine &#x3D; machine;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void execute() &#123;</span><br><span class="line">        machine.fastToBottom();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>测试类</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package CommandMode;</span><br><span class="line"></span><br><span class="line">public class Client &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        TetrisMachine tetrisMachine&#x3D;new TetrisMachine();</span><br><span class="line"></span><br><span class="line">        LeftCommand leftCommand&#x3D;new LeftCommand(tetrisMachine);</span><br><span class="line">        RightCommand rightCommand&#x3D;new RightCommand(tetrisMachine);</span><br><span class="line">        FallCommand fallCommand&#x3D;new FallCommand(tetrisMachine);</span><br><span class="line">        TransfromCommand transfromCommand&#x3D;new TransfromCommand(tetrisMachine);</span><br><span class="line"></span><br><span class="line">        Buttons buttons&#x3D;new Buttons();</span><br><span class="line">        buttons.setLeftCommand(leftCommand);</span><br><span class="line">        buttons.setRightCommand(rightCommand);</span><br><span class="line">        buttons.setTransfromCommand(transfromCommand);</span><br><span class="line">        buttons.setFallCommand(fallCommand);</span><br><span class="line"></span><br><span class="line">        buttons.fall();</span><br><span class="line">        buttons.toLeft();</span><br><span class="line">        buttons.toRight();</span><br><span class="line">        buttons.transfrom();</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="执行结果"><a href="#执行结果" class="headerlink" title="执行结果"></a>执行结果</h3>
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>​        命令模式中充分体现了几乎所有设计模式的通病，就是类的膨胀，大量衍生类的创建，这是一个不可避免的问题，但是，它给我们带来的好处也非常多，更弱的耦合性、更灵活的控制性以及更好的拓展性，不过，在实际开发过成功是不是需要采用命令模式还是需要斟酌</p>
+]]></content>
+      <categories>
+        <category>Android</category>
+      </categories>
+      <tags>
+        <tag>Android</tag>
+        <tag>编码规范</tag>
+        <tag>设计模式</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>原型模式</title>
+    <url>/2020/03/01/%E5%8E%9F%E5%9E%8B%E6%A8%A1%E5%BC%8F/</url>
+    <content><![CDATA[<p>使程序运行更高效-原型模式</p>
+<p>原型模式多用于创建复杂的或者构造耗时的实例，因为这种情况下，复制一个已经存在的实例可使程序运行更高效。</p>
+<a id="more"></a>
+
+<h3 id="原型模式的定义"><a href="#原型模式的定义" class="headerlink" title="原型模式的定义"></a>原型模式的定义</h3><p>用原型实例指定创建对象的种类，并通过复制这些原型创建新的对象。</p>
+<h3 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h3><ol>
+<li>类初始化需要消耗非常多的资源，这个资源包括数据，硬件资源等，通过原型复制避免这些消耗。</li>
+<li>通过new产生一个对象需要非常繁琐的数据准备或访问权限，这时可以使用原型模式。</li>
+<li>一个对象需要提供给其他对象访问，而且各个调用者可能都需要修改其值时，可以考虑使用原型模式复制多个对象供调用者，提供保护性拷贝</li>
+</ol>
+<p>注意：实现Cloneable接口的原型模式在调用clone函数构造实例并不一定比new对象快。只有在new对象时候非常耗时或者繁琐的时候，通过clone函数才会获得效率上的提升。</p>
+<h3 id="简单实现"><a href="#简单实现" class="headerlink" title="简单实现"></a>简单实现</h3><p><strong>文档类 JavaBean</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package Prototype;</span><br><span class="line"></span><br><span class="line">import java.util.ArrayList;</span><br><span class="line"></span><br><span class="line">public class WordDocument implements Cloneable&#123;</span><br><span class="line">    &#x2F;&#x2F;文本</span><br><span class="line">    private String mText;</span><br><span class="line">    &#x2F;&#x2F;图片名列表</span><br><span class="line">    private ArrayList&lt;String&gt; mImages&#x3D;new ArrayList&lt;String&gt;();</span><br><span class="line"></span><br><span class="line">    public WordDocument() &#123;</span><br><span class="line">        System.out.println(&quot;-----------构造函数-----------&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    protected WordDocument clone()&#123;</span><br><span class="line">        try &#123;</span><br><span class="line">            WordDocument document&#x3D;(WordDocument) super.clone();</span><br><span class="line">            document.mImages&#x3D;this.mImages;</span><br><span class="line">            document.mText&#x3D;this.mText;</span><br><span class="line">            return document;</span><br><span class="line">        &#125;catch (Exception e)&#123;</span><br><span class="line">        &#125;</span><br><span class="line">        return null;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public String getmText() &#123;</span><br><span class="line">        return mText;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void setmText(String mText) &#123;</span><br><span class="line">        this.mText &#x3D; mText;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public ArrayList&lt;String&gt; getmImages() &#123;</span><br><span class="line">        return mImages;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void setmImages(ArrayList&lt;String&gt; mImages) &#123;</span><br><span class="line">        this.mImages &#x3D; mImages;</span><br><span class="line">    &#125;</span><br><span class="line">    public void addImg(String name)&#123;</span><br><span class="line">        this.mImages.add(name);</span><br><span class="line">    &#125;</span><br><span class="line">    &#x2F;&#x2F;打印文档内容</span><br><span class="line">    public void showDocument()&#123;</span><br><span class="line">        System.out.println(&quot;-------word Content Start------&quot;);</span><br><span class="line">        System.out.println(&quot;text:&quot;+mText);</span><br><span class="line">        System.out.println(&quot;imgList:&quot;);</span><br><span class="line">        for (String name:mImages) &#123;</span><br><span class="line">            System.out.println(&quot;imgName:&quot;+name);</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(&quot;---------word Content End-------&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>演示端</strong>：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package Prototype;</span><br><span class="line"></span><br><span class="line">public class Client &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        WordDocument document&#x3D;new WordDocument();</span><br><span class="line">        document.setmText(&quot;这个是文档&quot;);</span><br><span class="line">        document.addImg(&quot;图片1&quot;);</span><br><span class="line">        document.addImg(&quot;图片2&quot;);</span><br><span class="line">        document.addImg(&quot;图片3&quot;);</span><br><span class="line">        document.showDocument();</span><br><span class="line"></span><br><span class="line">        &#x2F;&#x2F;以原始文档为原型，拷贝一份副本</span><br><span class="line">        WordDocument doc2&#x3D; document.clone();</span><br><span class="line">        doc2.showDocument();</span><br><span class="line">        doc2.setmText(&quot;这个是修改过的副本文档&quot;);</span><br><span class="line">        doc2.showDocument();</span><br><span class="line"></span><br><span class="line">        document.showDocument();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>执行结果：</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">-----------构造函数-----------</span><br><span class="line">-------word Content Start------</span><br><span class="line">text:这个是文档</span><br><span class="line">imgList:</span><br><span class="line">imgName:图片1</span><br><span class="line">imgName:图片2</span><br><span class="line">imgName:图片3</span><br><span class="line">---------word Content End-------</span><br><span class="line">-------word Content Start------</span><br><span class="line">text:这个是文档</span><br><span class="line">imgList:</span><br><span class="line">imgName:图片1</span><br><span class="line">imgName:图片2</span><br><span class="line">imgName:图片3</span><br><span class="line">---------word Content End-------</span><br><span class="line">-------word Content Start------</span><br><span class="line">text:这个是修改过的副本文档</span><br><span class="line">imgList:</span><br><span class="line">imgName:图片1</span><br><span class="line">imgName:图片2</span><br><span class="line">imgName:图片3</span><br><span class="line">---------word Content End-------</span><br><span class="line">-------word Content Start------</span><br><span class="line">text:这个是文档</span><br><span class="line">imgList:</span><br><span class="line">imgName:图片1</span><br><span class="line">imgName:图片2</span><br><span class="line">imgName:图片3</span><br><span class="line">---------word Content End-------</span><br><span class="line"></span><br><span class="line">Process finished with exit code 0</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>由上面可以看到，doc2是通过document.clone()创建的，并且第一次输出的时候2个对象的输出是一样的。而且doc2修改文本内容后不会改变影响document对象的文本内容，这就保证了document的安全性。还需要注意的是，<strong>通过clone拷贝对象的时候是不会执行构造函数的</strong></p>
+<h3 id="深拷贝和浅拷贝"><a href="#深拷贝和浅拷贝" class="headerlink" title="深拷贝和浅拷贝"></a>深拷贝和浅拷贝</h3><p>上面的拷贝被称为浅拷贝，也称作影子拷贝。并不是将所有字段都重新构造了一份，而是通过副本文档的字段引用原始文档的字段。</p>
+<p>因此，如果A引用B，那么无论修改A还是B对象，另一个对象都会随之改变。但我们大多数时候都需要A/B对象改变的时候另一个对象不会改变，那么我们如何避免这种情况呢，这边就引出了新的概念：<strong>深拷贝</strong></p>
+<p>所谓深拷贝，即在拷贝对象时，对于引用型的字段也要采用拷贝的形式，而不是单纯的引用形式。这里就借用上面的demo代码做相关改动，使浅拷贝变成深拷贝。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F;深拷贝</span><br><span class="line">@Override</span><br><span class="line">   protected WordDocument clone()&#123;</span><br><span class="line">       try &#123;</span><br><span class="line">           WordDocument document&#x3D;(WordDocument) super.clone();</span><br><span class="line">           document.mImages&#x3D;(ArrayList&lt;String&gt;) this.mImages.clone();</span><br><span class="line">           document.mText&#x3D;this.mText;</span><br><span class="line">           return document;</span><br><span class="line">       &#125;catch (Exception e)&#123;</span><br><span class="line">       &#125;</span><br><span class="line">       return null;</span><br><span class="line">   &#125;</span><br><span class="line">   </span><br><span class="line">&#x2F;&#x2F;浅拷贝</span><br><span class="line"> @Override</span><br><span class="line">   protected WordDocument clone()&#123;</span><br><span class="line">       try &#123;</span><br><span class="line">           WordDocument document&#x3D;(WordDocument) super.clone();</span><br><span class="line">           document.mImages&#x3D;this.mImages;</span><br><span class="line">           document.mText&#x3D;this.mText;</span><br><span class="line">           return document;</span><br><span class="line">       &#125;catch (Exception e)&#123;</span><br><span class="line">       &#125;</span><br><span class="line">       return null;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们可以看到上面的改动对比：深拷贝时调用的clone函数,将中间mImages指向this.mImages的拷贝，而不是它的本身。这样在修改doc2对象时调用addImg()函数就不会影响到document对象了。</p>
+<p><strong>so 我们在平时使用的时候尽量要使用深拷贝，以免造成操作副本时影响原始对象的问题</strong></p>
+]]></content>
+      <categories>
+        <category>Android</category>
+      </categories>
+      <tags>
+        <tag>Android</tag>
+        <tag>编码规范</tag>
+        <tag>设计模式</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>备忘录模式</title>
+    <url>/2020/07/25/%E5%A4%87%E5%BF%98%E5%BD%95%E6%A8%A1%E5%BC%8F/</url>
+    <content><![CDATA[<p>编程中的‘后悔药’-备忘录模式</p>
+<a id="more"></a>
+
+<h2 id="模式简介"><a href="#模式简介" class="headerlink" title="模式简介"></a>模式简介</h2><p>再不破坏封闭的前提下，捕获一个对象的内部状态，并在该对象之外保存这个状态，这样，以后就可以将该对象恢复到原先保存状态。</p>
+<h2 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h2><ol>
+<li>需要保存一个对象在某一时刻的状态或者部分状态</li>
+<li>如果用一个接口来让其他对象得到这些状态，将会暴露对象的实现细节并破坏对象的封装性，一个对象不希望外接直接访问其内部状态，通过中间对象可以间接访问其内部状态</li>
+</ol>
+<h2 id="简单实现"><a href="#简单实现" class="headerlink" title="简单实现"></a>简单实现</h2><p><strong>使命召唤游戏</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package MementoPattern;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F;使命召唤游戏</span><br><span class="line">public class CallOfDuty &#123;</span><br><span class="line">    private int mCheckpoint&#x3D;1;</span><br><span class="line">    private int mLifeValue&#x3D;100;</span><br><span class="line">    private String mWeapon&#x3D;&quot;沙漠之鹰&quot;;</span><br><span class="line">    &#x2F;&#x2F;玩游戏</span><br><span class="line">    public void play()&#123;</span><br><span class="line">        System.out.println(&quot;玩游戏：&quot;+String.format(&quot;第%d关&quot;,mCheckpoint)+&quot;奋战杀敌中&quot;);</span><br><span class="line">        mLifeValue-&#x3D;10;</span><br><span class="line">        System.out.println(&quot;进度升级了&quot;);</span><br><span class="line">        mCheckpoint++;</span><br><span class="line">        System.out.println(&quot;到达&quot;+String.format(&quot;第%d关&quot;,mCheckpoint));</span><br><span class="line">    &#125;</span><br><span class="line">    &#x2F;&#x2F;退出游戏</span><br><span class="line">    public void quit()&#123;</span><br><span class="line">        System.out.println(&quot;----------&quot;);</span><br><span class="line">        System.out.println(&quot;退出游戏前属性：&quot;+this.toString());</span><br><span class="line">        System.out.println(&quot;退出游戏&quot;);</span><br><span class="line">        System.out.println(&quot;----------&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">    &#x2F;&#x2F;创建备忘录</span><br><span class="line">    public Memoto createMemoto()&#123;</span><br><span class="line">        Memoto memoto&#x3D;new Memoto();</span><br><span class="line">        memoto.mCheckpoint&#x3D;mCheckpoint;</span><br><span class="line">        memoto.mLifeValue&#x3D;mLifeValue;</span><br><span class="line">        memoto.mWeapon&#x3D;mWeapon;</span><br><span class="line">        return memoto;</span><br><span class="line">    &#125;</span><br><span class="line">    &#x2F;&#x2F;恢复游戏</span><br><span class="line">    public void restore(Memoto memoto)&#123;</span><br><span class="line">        this.mCheckpoint&#x3D;memoto.mCheckpoint;</span><br><span class="line">        this.mLifeValue&#x3D;memoto.mLifeValue;</span><br><span class="line">        this.mWeapon&#x3D;memoto.mWeapon;</span><br><span class="line">        System.out.println(&quot;恢复游戏后的属性：&quot;+this.toString());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public int getmCheckpoint() &#123;</span><br><span class="line">        return mCheckpoint;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void setmCheckpoint(int mCheckpoint) &#123;</span><br><span class="line">        this.mCheckpoint &#x3D; mCheckpoint;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public int getmLifeValue() &#123;</span><br><span class="line">        return mLifeValue;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void setmLifeValue(int mLifeValue) &#123;</span><br><span class="line">        this.mLifeValue &#x3D; mLifeValue;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public String getmWeapon() &#123;</span><br><span class="line">        return mWeapon;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void setmWeapon(String mWeapon) &#123;</span><br><span class="line">        this.mWeapon &#x3D; mWeapon;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public String toString() &#123;</span><br><span class="line">        return &quot;CallOfDuty&#123;&quot; +</span><br><span class="line">                &quot;mCheckpoint&#x3D;&quot; + mCheckpoint +</span><br><span class="line">                &quot;, mLifeValue&#x3D;&quot; + mLifeValue +</span><br><span class="line">                &quot;, mWeapon&#x3D;&#39;&quot; + mWeapon + &#39;\&#39;&#39; +</span><br><span class="line">                &#39;&#125;&#39;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>管理类，负责管理备忘录</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package MementoPattern;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F;Caretaker 管理类，负责管理Memoto</span><br><span class="line">public class Caretaker &#123;</span><br><span class="line">    Memoto memoto;&#x2F;&#x2F;备忘录</span><br><span class="line">    &#x2F;&#x2F;存档</span><br><span class="line">    public void archive(Memoto memoto)&#123;</span><br><span class="line">        this.memoto&#x3D;memoto;</span><br><span class="line">    &#125;</span><br><span class="line">    &#x2F;&#x2F;获取存档</span><br><span class="line">    public Memoto getMemoto()&#123;</span><br><span class="line">        return memoto;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>备忘录类</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package MementoPattern;</span><br><span class="line">&#x2F;&#x2F;备忘录类</span><br><span class="line">public class Memoto &#123;</span><br><span class="line">    public int mCheckpoint;</span><br><span class="line">    public int mLifeValue;</span><br><span class="line">    public String mWeapon;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public String toString() &#123;</span><br><span class="line">        return &quot;Memoto&#123;&quot; +</span><br><span class="line">                &quot;mCheckpoint&#x3D;&quot; + mCheckpoint +</span><br><span class="line">                &quot;, mLifeValue&#x3D;&quot; + mLifeValue +</span><br><span class="line">                &quot;, mWeapon&#x3D;&#39;&quot; + mWeapon + &#39;\&#39;&#39; +</span><br><span class="line">                &#39;&#125;&#39;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>测试代码</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package MementoPattern;</span><br><span class="line"></span><br><span class="line">public class Client &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        &#x2F;&#x2F;构建对象</span><br><span class="line">        CallOfDuty callOfDuty&#x3D;new CallOfDuty();</span><br><span class="line">        &#x2F;&#x2F;打游戏</span><br><span class="line">        callOfDuty.play();</span><br><span class="line"></span><br><span class="line">        Caretaker caretaker&#x3D;new Caretaker();</span><br><span class="line">        &#x2F;&#x2F;游戏存档</span><br><span class="line">        caretaker.archive(callOfDuty.createMemoto());</span><br><span class="line">        &#x2F;&#x2F;退出游戏</span><br><span class="line">        callOfDuty.quit();</span><br><span class="line">        &#x2F;&#x2F;恢复游戏</span><br><span class="line">        CallOfDuty game&#x3D;new CallOfDuty();</span><br><span class="line">        game.restore(caretaker.getMemoto());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="执行结果"><a href="#执行结果" class="headerlink" title="执行结果"></a>执行结果</h3><img src="/2020/07/25/%E5%A4%87%E5%BF%98%E5%BD%95%E6%A8%A1%E5%BC%8F/xxx.png" class="" title="执行结果">
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>备忘录模式是在不破坏封装的条件下，通过备忘录对象（Memoto）存储另外一个对象内部状态的快照，在将来合适的时候把这个对象还原到存储起来的状态。</p>
+<p><strong>优点</strong>：</p>
+<ol>
+<li>给用户提供了一种可以恢复状态的机制，可以使用户能够比较方便的回到某个历史状态。</li>
+<li>实现了信息的封装，使得用户不需要关心状态的保存细节</li>
+</ol>
+<p><strong>缺点</strong>：</p>
+<pre><code> 消耗资源，如果类的成员变量过多，势必会占用比较大的资源，而且每一次保存都会消耗一定的内存。</code></pre>
+]]></content>
+      <categories>
+        <category>Android</category>
+      </categories>
+      <tags>
+        <tag>Android</tag>
+        <tag>编码规范</tag>
+        <tag>设计模式</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>建造者模式</title>
+    <url>/2019/12/28/%E5%BB%BA%E9%80%A0%E8%80%85%E6%A8%A1%E5%BC%8F/</url>
+    <content><![CDATA[<p>自由拓展你的项目：建造者模式(Builder模式)</p>
+<a id="more"></a>
+
+<h2 id="简单实现"><a href="#简单实现" class="headerlink" title="简单实现"></a>简单实现</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"></span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <categories>
+        <category>Android</category>
+      </categories>
+      <tags>
+        <tag>Android</tag>
+        <tag>编码规范</tag>
+        <tag>设计模式</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>工厂模式</title>
+    <url>/2020/03/07/%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F/</url>
+    <content><![CDATA[<p>应用最广泛的模式-工厂方法模式</p>
+<a id="more"></a>
+
+<h2 id="模式简介"><a href="#模式简介" class="headerlink" title="模式简介"></a>模式简介</h2><p>创建型设计模式，定义一个用于创建对象的接口，让子类决定实例化哪个类。</p>
+<h2 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h2><p>在任何需要生成复杂对象的地方，都可以使用工厂模式。复杂对象适合使用工厂模式，用ｎｅｗ就可以完成创建的对象无需使用工厂模式</p>
+<h2 id="简单实现"><a href="#简单实现" class="headerlink" title="简单实现"></a>简单实现</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F;功能的抽象基类</span><br><span class="line">public abstract class AudiCar &#123;</span><br><span class="line">    &#x2F;&#x2F;驾驶函数</span><br><span class="line">    public abstract void drive();</span><br><span class="line">    &#x2F;&#x2F;自动巡航函数</span><br><span class="line">    public abstract void selfNavigation();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F;生产线类</span><br><span class="line">public class AudiCarFactory extends AudiFactory &#123;</span><br><span class="line">    public &lt;T extends AudiCar&gt; T creatAudiCar(Class&lt;T&gt; tclass) &#123;</span><br><span class="line">        AudiCar audiCar&#x3D;null;</span><br><span class="line">        try&#123;</span><br><span class="line">            audiCar&#x3D;(AudiCar) Class.forName(tclass.getName()).newInstance();</span><br><span class="line">        &#125; catch (IllegalAccessException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125; catch (InstantiationException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125; catch (ClassNotFoundException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        return (T)audiCar;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F;工厂抽象类</span><br><span class="line">public abstract class AudiFactory &#123;</span><br><span class="line">    &#x2F;&#x2F;某车型的工厂方法</span><br><span class="line">    public abstract &lt;T extends AudiCar&gt;T creatAudiCar(Class&lt;T&gt; tclass);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F;产品类A</span><br><span class="line">public class AudiQ3 extends AudiCar &#123;</span><br><span class="line">    public void drive() &#123;</span><br><span class="line">        System.out.println(&quot;Q3发动了！！&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void selfNavigation() &#123;</span><br><span class="line">        System.out.println(&quot;Q3开始了自动巡航！！&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F;产品类B</span><br><span class="line">public class AudiQ5 extends AudiCar &#123;</span><br><span class="line">    public void drive() &#123;</span><br><span class="line">        System.out.println(&quot;Q5发动了！！&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void selfNavigation() &#123;</span><br><span class="line">        System.out.println(&quot;Q5开始了自动巡航！！&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F;演示DEMO类</span><br><span class="line">public class Client &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        AudiFactory audiFactory&#x3D;new AudiCarFactory();</span><br><span class="line">        AudiQ3 audiQ3&#x3D;audiFactory.creatAudiCar(AudiQ3.class);</span><br><span class="line">        audiQ3.drive();</span><br><span class="line">        audiQ3.selfNavigation();</span><br><span class="line">        AudiQ5 audiQ5&#x3D;audiFactory.creatAudiCar(AudiQ5.class);</span><br><span class="line">        audiQ5.drive();</span><br><span class="line">        audiQ5.selfNavigation();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="执行结果"><a href="#执行结果" class="headerlink" title="执行结果"></a>执行结果</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Q3发动了！！</span><br><span class="line">Q3开始了自动巡航！！</span><br><span class="line">Q5发动了！！</span><br><span class="line">Q5开始了自动巡航！！</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h2><p>每次为工厂方法模式添加新的产品时就要编写一个新的产品类，同时还要引入抽象层，这必然会导致类结构的复杂化，所以，在情况比较简单的时候可能不适用使用工厂方法模式。需要我们自己去衡量</p>
+]]></content>
+      <categories>
+        <category>Android</category>
+      </categories>
+      <tags>
+        <tag>Android</tag>
+        <tag>编码规范</tag>
+        <tag>设计模式</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>抽象工厂模式</title>
+    <url>/2020/03/22/%E6%8A%BD%E8%B1%A1%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F/</url>
+    <content><![CDATA[<p>创建型设计模式-抽象工厂方法模式</p>
+<a id="more"></a>
+
+<h2 id="模式简介"><a href="#模式简介" class="headerlink" title="模式简介"></a>模式简介</h2><p>为创建一组相关或者是相互依赖的对象提供一个接口，而不需要指定他们的具体类</p>
+<h2 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h2><p>一个对象族有相同的约束时就可以使用抽象工厂模式。例如：Android、iOS、Windows phone 下都有打电话、发短信功能软件，但是它们所处的操作系统不一样，即便是同一家公司出品的软件，其代码所实现的逻辑也是不同的，这个时候就可以考虑使用抽象工厂方法模式来产生Android、iOS、Windows phone 下的短信软件和电话软件</p>
+<h2 id="简单实现"><a href="#简单实现" class="headerlink" title="简单实现"></a>简单实现</h2><p><strong>抽象车场类</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;* 抽象车场类*&#x2F;</span><br><span class="line">public abstract class CarFactory &#123;</span><br><span class="line">    &#x2F;&#x2F;生产轮胎</span><br><span class="line">    public abstract ITire creatTire();</span><br><span class="line">    &#x2F;&#x2F;生产发动机</span><br><span class="line">    public abstract IEngine creatEngine();</span><br><span class="line">    &#x2F;&#x2F;生产制动系统</span><br><span class="line">    public abstract IBrake creatBrake();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>轮胎相关类</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">public interface ITire &#123;</span><br><span class="line">    &#x2F;&#x2F;轮胎</span><br><span class="line">    void tire();</span><br><span class="line">&#125;</span><br><span class="line">public class NormalTire implements ITire &#123;</span><br><span class="line">    public void tire() &#123;</span><br><span class="line">        System.out.println(&quot;普通轮胎&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">public class SUVTire implements ITire &#123;</span><br><span class="line">    public void tire() &#123;</span><br><span class="line">        System.out.println(&quot;越野轮胎&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>制动系统相关类</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">public interface IBrake &#123;</span><br><span class="line">    &#x2F;&#x2F;制动系统</span><br><span class="line">    void brake();</span><br><span class="line">&#125;</span><br><span class="line">public class NomalBrake implements IBrake &#123;</span><br><span class="line">    public void brake() &#123;</span><br><span class="line">        System.out.println(&quot;普通制动&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">public class SeriorBrake implements IBrake &#123;</span><br><span class="line">    public void brake() &#123;</span><br><span class="line">        System.out.println(&quot;高级制动&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>发动机相关类</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">public interface IEngine &#123;</span><br><span class="line">    &#x2F;&#x2F;发动机</span><br><span class="line">    void engine();</span><br><span class="line">&#125;</span><br><span class="line">public class DomesticEngine implements IEngine &#123;</span><br><span class="line">    public void engine() &#123;</span><br><span class="line">        System.out.println(&quot;国产发动机&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">public class ImportEngine implements IEngine &#123;</span><br><span class="line">    public void engine() &#123;</span><br><span class="line">        System.out.println(&quot;进口发动机&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>Q3工厂类</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">public class Q3Factory extends CarFactory &#123;</span><br><span class="line">    public ITire creatTire() &#123;</span><br><span class="line">        return new NormalTire();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public IEngine creatEngine() &#123;</span><br><span class="line">        return new DomesticEngine();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public IBrake creatBrake() &#123;</span><br><span class="line">        return new NomalBrake();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>Q7工厂类</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">public class Q7Factory extends CarFactory &#123;</span><br><span class="line">    public ITire creatTire() &#123;</span><br><span class="line">        return new SUVTire();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public IEngine creatEngine() &#123;</span><br><span class="line">        return new ImportEngine();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public IBrake creatBrake() &#123;</span><br><span class="line">        return new SeriorBrake();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>测试主函数</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">public class Client &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        &#x2F;&#x2F;构造一个生产Q3的工厂</span><br><span class="line">        CarFactory factoryQ3&#x3D;new Q3Factory();</span><br><span class="line">        factoryQ3.creatTire().tire();</span><br><span class="line">        factoryQ3.creatBrake().brake();</span><br><span class="line">        factoryQ3.creatEngine().engine();</span><br><span class="line"></span><br><span class="line">        System.out.println(&quot;--------------------------&quot;);</span><br><span class="line"></span><br><span class="line">        &#x2F;&#x2F;构造一个生产Q7的工厂</span><br><span class="line">        CarFactory factoryQ7&#x3D;new Q7Factory();</span><br><span class="line">        factoryQ7.creatEngine().engine();</span><br><span class="line">        factoryQ7.creatBrake().brake();</span><br><span class="line">        factoryQ7.creatTire().tire();</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>执行结果</strong></p>
+<img src="/2020/03/22/%E6%8A%BD%E8%B1%A1%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F/show.png" class="" title="执行结果">
+
+
+
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>上面我们只是模拟了2款车型，如果我们此时再增加车型的话，就要增加相应的发动机、制动系统和轮胎类。这里其实就是抽象工厂方法模式的弊端，那就是类的陡增，如果工厂类过多，势必导致类文件增多。权衡使用~</p>
+<h3 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h3><p>分离接口与实现，客户端使用抽象工厂来创建需要的对象，而客户端根本就不知道具体的实现是谁，客户端只是面向产品的接口编程而已，使其从具体的产品实现中解耦，同时基于接口与实现的分离，使抽象该工厂方法模式在切换产品类是更加灵活、容易</p>
+<h3 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h3><ol>
+<li>类文件的大量增加</li>
+<li>不太容易拓展新的产品类：因为每拓展一次都要修改抽象工厂，那么全部的具体实现类都要进行更改</li>
+</ol>
+<p><strong>Android源码中的应用</strong>：mediaplayer 类</p>
+<p><strong>实际开发中的应用</strong>：主题更改</p>
+]]></content>
+      <categories>
+        <category>Android</category>
+      </categories>
+      <tags>
+        <tag>Android</tag>
+        <tag>编码规范</tag>
+        <tag>设计模式</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>模板方法模式</title>
+    <url>/2020/07/25/%E6%A8%A1%E6%9D%BF%E6%96%B9%E6%B3%95%E6%A8%A1%E5%BC%8F/</url>
+    <content><![CDATA[<p>抓住问题的核心-模板方法模式</p>
+<a id="more"></a>
+
+<h2 id="模式定义"><a href="#模式定义" class="headerlink" title="模式定义"></a>模式定义</h2><p>定义一个操作中的算法的矿建，而将一些步骤延迟到子类中，使得子类可以不改变一个算法结构即可重定义该算法的某些特定步骤。</p>
+<h2 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h2><ol>
+<li>多个子类有公有的方法，并且逻辑基本相同时</li>
+<li>重要、复杂的算法，可以把核心算法设计为模板方法，周边的相关细节功能则由各个子类实现。</li>
+<li>重构时，模板方法是一个经常使用的模式，把相同的代码抽取到父类中，然后通过钩子函数约束其行为。</li>
+</ol>
+<h2 id="简单实现"><a href="#简单实现" class="headerlink" title="简单实现"></a>简单实现</h2><p><strong>模板方法</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package TemplatemethodMode;</span><br><span class="line"></span><br><span class="line">public abstract class AbstractComputer &#123;</span><br><span class="line">    protected void powerOn()&#123;</span><br><span class="line">        System.out.println(&quot;开启电源&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">    protected void checkHardware()&#123;</span><br><span class="line">        System.out.println(&quot;硬件检查&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">    protected void loadOS()&#123;</span><br><span class="line">        System.out.println(&quot;载入操作系统&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">    protected void login()&#123;</span><br><span class="line">        System.out.println(&quot;小白的计算机无验证，直接进入系统&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public final void startUp()&#123;</span><br><span class="line">        System.out.println(&quot;------关机 START-------&quot;);</span><br><span class="line">        powerOn();</span><br><span class="line">        checkHardware();</span><br><span class="line">        loadOS();</span><br><span class="line">        login();</span><br><span class="line">        System.out.println(&quot;------关机 END --------&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>具体实现类A</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package TemplatemethodMode;</span><br><span class="line"></span><br><span class="line">public class CoderComputer extends AbstractComputer &#123;</span><br><span class="line">    @Override</span><br><span class="line">    protected void login() &#123;</span><br><span class="line">        System.out.println(&quot;程序员只需要进行用户和密码验证就可以了&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>具体实现类B</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package TemplatemethodMode;</span><br><span class="line"></span><br><span class="line">public class MilitaryComputer extends AbstractComputer &#123;</span><br><span class="line">    @Override</span><br><span class="line">    protected void checkHardware() &#123;</span><br><span class="line">        System.out.println(&quot;检查硬件防火墙&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    protected void login() &#123;</span><br><span class="line">        System.out.println(&quot;进行指纹识别等复杂的用户验证&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>测试类</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package TemplatemethodMode;</span><br><span class="line"></span><br><span class="line">public class Client &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        AbstractComputer computer&#x3D;new CoderComputer();</span><br><span class="line">        computer.startUp();</span><br><span class="line"></span><br><span class="line">        computer&#x3D;new MilitaryComputer();</span><br><span class="line">        computer.startUp();</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>执行结果</strong></p>
+<img src="/2020/07/25/%E6%A8%A1%E6%9D%BF%E6%96%B9%E6%B3%95%E6%A8%A1%E5%BC%8F/ddd.png" class="" title="执行结果">
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>流程封装，也就是把某个固定的流程封装到一个final函数中， 并且让子类能够定制这流程中的某些或者所有步骤，这就要求父类提供共用的代码，提升代码的复用率，同时也带来了更好的可拓展性。</p>
+<p><strong>优点</strong>：</p>
+<ol>
+<li><p>封装不变部分，拓展可变部分</p>
+<pre><code>2. 提取公共部分代码，便于维护</code></pre>
+</li>
+</ol>
+<p><strong>缺点</strong>：</p>
+<p>模板方法会带来代码阅读的难度，会让用户觉得难以理解</p>
+]]></content>
+      <categories>
+        <category>Android</category>
+      </categories>
+      <tags>
+        <tag>Android</tag>
+        <tag>编码规范</tag>
+        <tag>设计模式</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>策略模式</title>
+    <url>/2020/03/22/%E7%AD%96%E7%95%A5%E6%A8%A1%E5%BC%8F/</url>
+    <content><![CDATA[<p>时势造英雄-策略模式</p>
+<a id="more"></a>
+
+<p>##　模式简介</p>
+<p>策略模式定义了一系列的算法，并将每一个算法独立封装起来，而且使它们还可以相互替换。策略模式让算法独立于它的客户而独立变化</p>
+<h2 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h2><ul>
+<li>针对同一类型问题的多种处理方式，仅仅是具体行为有差别时。</li>
+<li>需要安全的封装多种同一类型的操作时</li>
+<li>出现同一抽象类有多个子类，而又需要使用if-else或者switch-case来选择子类时</li>
+</ul>
+<h2 id="简单实现"><a href="#简单实现" class="headerlink" title="简单实现"></a>简单实现</h2><p>以计算公交车和地铁票价为例子</p>
+<p><strong>计算接口</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">public interface CalculateStrategy &#123;</span><br><span class="line">    &#x2F;&#x2F;根据距离计算价格</span><br><span class="line">    int calculatePrice(int km);</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>公交车计算</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F;公交车的价格计算策略</span><br><span class="line">public class BudStrategy implements CalculateStrategy &#123;</span><br><span class="line">    &#x2F;&#x2F;10公里内1元，超过10公里每5公里加收1元</span><br><span class="line">    public int calculatePrice(int km) &#123;</span><br><span class="line">        int extraTotal &#x3D; km -10;</span><br><span class="line">        int extraFactor &#x3D; extraTotal&#x2F;5;</span><br><span class="line">        int fraction&#x3D;extraTotal%5;</span><br><span class="line">        &#x2F;&#x2F;价格计算，分段式计价</span><br><span class="line">        int price&#x3D;1+extraFactor*1;</span><br><span class="line">        return fraction&gt;0?++price:price;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>地铁计算</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F;地铁的价格计算策略</span><br><span class="line">public class SubwayStrategy implements CalculateStrategy &#123;</span><br><span class="line">    public int calculatePrice(int km) &#123;</span><br><span class="line">        &#x2F;&#x2F;6公里内3元，6~12 4元  12~22 5元  22~32 6元</span><br><span class="line">        if(km&lt;&#x3D;6)&#123;</span><br><span class="line">            return 3;</span><br><span class="line">        &#125;else if(km&gt;6&amp;&amp;km&lt;12)&#123;</span><br><span class="line">            return 4;</span><br><span class="line">        &#125;else if(km&gt;12&amp;&amp;km&lt;22)&#123;</span><br><span class="line">            return 5;</span><br><span class="line">        &#125;else if(km&gt;22&amp;&amp;km&lt;32)&#123;</span><br><span class="line">            return 6;</span><br><span class="line">        &#125;</span><br><span class="line">        &#x2F;&#x2F;其他距离简化7元</span><br><span class="line">        return 7;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>调用实现的测试类</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">public class TranficCalculator &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        TranficCalculator tranficCalculator&#x3D;new TranficCalculator();</span><br><span class="line">        &#x2F;&#x2F;设置策略</span><br><span class="line">        tranficCalculator.setCalculateStrategy(new BudStrategy());</span><br><span class="line">        int price&#x3D;tranficCalculator.calculatePrice(16);</span><br><span class="line">        System.out.println(&quot;公交车乘坐16公里的价格&quot;+price);</span><br><span class="line">    &#125;</span><br><span class="line">    CalculateStrategy mCalculateStrategy;</span><br><span class="line">    public void setCalculateStrategy(CalculateStrategy calculateStrategy)&#123;</span><br><span class="line">        this.mCalculateStrategy&#x3D;calculateStrategy;</span><br><span class="line">    &#125;</span><br><span class="line">    public int calculatePrice(int km)&#123;</span><br><span class="line">        return mCalculateStrategy.calculatePrice(km);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>执行结果</strong></p>
+<img src="/2020/03/22/%E7%AD%96%E7%95%A5%E6%A8%A1%E5%BC%8F/show.png" class="" title="执行结果">
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>​    建立抽象，将不同的策略构建成一个具体策略实现，通过不同的策略实现算法替换。在简化逻辑、结构的同时，增强了系统的可读性、稳定性、可拓展性、这对于较为复杂的业务显得更为直观，拓展也更为方便</p>
+<p><strong>优点</strong></p>
+<ol>
+<li>结构清晰明了，使用简单直观</li>
+<li>耦合度相对而言降低，拓展方便</li>
+<li>操作封装也更为彻底，数据更为安全</li>
+</ol>
+<p><strong>缺点</strong></p>
+<ol>
+<li>随着策略的增加，子类也会变得繁多</li>
+</ol>
+]]></content>
+      <categories>
+        <category>Android</category>
+      </categories>
+      <tags>
+        <tag>Android</tag>
+        <tag>编码规范</tag>
+        <tag>设计模式</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>观察者模式</title>
+    <url>/2020/07/04/%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8F/</url>
+    <content><![CDATA[<p>解决、解耦的钥匙-观察者模式</p>
+<a id="more"></a>
+
+<h2 id="模式简介"><a href="#模式简介" class="headerlink" title="模式简介"></a>模式简介</h2><p>定义对象间一种一对多的依赖关系，使得每当一个对象改变状态，则所有依赖于它的对象都会得到通知并被自动更新</p>
+<h2 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h2><ol>
+<li>关联行为场景，需要注意的是，关联行为是可以拆分的，而不是组合关系；</li>
+<li>事件多级触发场景；</li>
+<li>跨系统的消息交换场景，如消息队列、事件总线的处理机制；</li>
+</ol>
+<h2 id="简单实现"><a href="#简单实现" class="headerlink" title="简单实现"></a>简单实现</h2><p><strong>观察者</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package ObserverMode;</span><br><span class="line"></span><br><span class="line">import java.util.Observable;</span><br><span class="line">import java.util.Observer;</span><br><span class="line"></span><br><span class="line">public class Coder implements Observer &#123;</span><br><span class="line">    private String name;</span><br><span class="line"></span><br><span class="line">    public Coder(String name) &#123;</span><br><span class="line">        this.name &#x3D; name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void update(Observable o, Object arg) &#123;</span><br><span class="line">        System.out.println(&quot;hi&quot;+name+&quot;更新了，内容&quot;+arg);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public String toString() &#123;</span><br><span class="line">        return &quot;Coder&#123;&quot; +</span><br><span class="line">                &quot;name&#x3D;&#39;&quot; + name + &#39;\&#39;&#39; +</span><br><span class="line">                &#39;&#125;&#39;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>被观察者</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package ObserverMode;</span><br><span class="line"></span><br><span class="line">import java.util.Observable;</span><br><span class="line"></span><br><span class="line">public class DevTechFrontier extends Observable &#123;</span><br><span class="line">    public void postNewPublication(String content)&#123;</span><br><span class="line">        setChanged();</span><br><span class="line">        notifyObservers(content);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>测试代码</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package ObserverMode;</span><br><span class="line"></span><br><span class="line">public class Test &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        DevTechFrontier devTechFrontier&#x3D;new DevTechFrontier();</span><br><span class="line"></span><br><span class="line">        Coder coder&#x3D;new Coder(&quot;coder&quot;);</span><br><span class="line">        Coder coder1&#x3D;new Coder(&quot;coder1&quot;);</span><br><span class="line">        Coder coder2&#x3D;new Coder(&quot;coder2&quot;);</span><br><span class="line">        Coder coder3&#x3D;new Coder(&quot;coder3&quot;);</span><br><span class="line"></span><br><span class="line">        devTechFrontier.addObserver(coder);</span><br><span class="line">        devTechFrontier.addObserver(coder1);</span><br><span class="line">        devTechFrontier.addObserver(coder2);</span><br><span class="line">        devTechFrontier.addObserver(coder3);</span><br><span class="line"></span><br><span class="line">        devTechFrontier.postNewPublication(&quot;新一期的周报发布了&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="执行结果"><a href="#执行结果" class="headerlink" title="执行结果"></a>执行结果</h3><img src="/2020/07/04/%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8F/ObserverMode.png" class="" title="执行结果">
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>主要作用就是对象解耦，将观察者与被观察者完全隔离，只依赖于Observer和Observable抽象，例如，listview就是运用了Adapter和观察者模式使得它的可拓展性、灵活性非常强，而耦合度却很低。</p>
+<p><strong>优点：</strong></p>
+<ol>
+<li>观察者与被观察者之间是抽象耦合，应对业务变化</li>
+<li>增强系统灵活性、可拓展性</li>
+</ol>
+<p><strong>缺点：</strong></p>
+<p>​        在应用观察者模式是需要考虑一下开发效率以及运行效率的问题，程序中包括一个被观察者，多个观察者、开发和调试等内容会比较复杂，而且在java中消息的通知默认是顺序执行，一个观察者卡顿，会影响整体的执行效率，在这种情况下，一般考虑采用异步的方式。</p>
+]]></content>
+      <categories>
+        <category>Android</category>
+      </categories>
+      <tags>
+        <tag>Android</tag>
+        <tag>编码规范</tag>
+        <tag>设计模式</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>解释器模式</title>
+    <url>/2020/06/29/%E8%A7%A3%E9%87%8A%E5%99%A8%E6%A8%A1%E5%BC%8F/</url>
+    <content><![CDATA[<p>化简为繁的翻译机-解释器模式</p>
+<a id="more"></a>
+
+<h2 id="模式简介"><a href="#模式简介" class="headerlink" title="模式简介"></a>模式简介</h2><p>定义：给定一个语言，定义它的文法的一种表示，并定义一个解释器，该解释器使用该表示来解释语言中的例子</p>
+<h2 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h2><ol>
+<li>如果某个简单的语言需要解释执行而且可以将语言中的语句表示为一个抽象语法树时可以考虑使用解释器模式</li>
+<li>在某些特定的领域出现不断重复的问题时，可以将该领域的问题转换为一种语法规则下的语句，然后构建解释器来解释该语句</li>
+</ol>
+<h2 id="简单实现"><a href="#简单实现" class="headerlink" title="简单实现"></a>简单实现</h2><p><strong>抽象的算术运算解释器 为所有解释器共性的提取</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package InterpreterMode;</span><br><span class="line"></span><br><span class="line">public abstract class ArithmeticExpression &#123;</span><br><span class="line">    &#x2F;&#x2F;抽象的解析方法</span><br><span class="line">    public abstract int interpret();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>数字解释器 为了解释数字</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package InterpreterMode;</span><br><span class="line"></span><br><span class="line">public class NumExpression extends ArithmeticExpression &#123;</span><br><span class="line">    private int num;</span><br><span class="line"></span><br><span class="line">    public NumExpression(int num) &#123;</span><br><span class="line">        this.num &#x3D; num;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public int interpret() &#123;</span><br><span class="line">        return num;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>运算符号抽象解释器 为所有运算符号解释器共性的提取</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package InterpreterMode;</span><br><span class="line"></span><br><span class="line">public abstract class OperatorExpression extends ArithmeticExpression &#123;</span><br><span class="line">    protected ArithmeticExpression exp1,exp2;</span><br><span class="line"></span><br><span class="line">    public OperatorExpression(ArithmeticExpression exp1, ArithmeticExpression exp2) &#123;</span><br><span class="line">        this.exp1 &#x3D; exp1;</span><br><span class="line">        this.exp2 &#x3D; exp2;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>加法运算抽象解释器</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package InterpreterMode;</span><br><span class="line"></span><br><span class="line">public class AdditionExpression extends OperatorExpression &#123;</span><br><span class="line">    public AdditionExpression(ArithmeticExpression exp1, ArithmeticExpression exp2) &#123;</span><br><span class="line">        super(exp1, exp2);</span><br><span class="line">    &#125;</span><br><span class="line">    public int interpret() &#123;</span><br><span class="line">        return exp1.interpret()+exp2.interpret();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>处理与解释相关的一些业务</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package InterpreterMode;</span><br><span class="line"></span><br><span class="line">import java.util.Stack;</span><br><span class="line"></span><br><span class="line">public class Calculator &#123;</span><br><span class="line">    &#x2F;&#x2F;声明一个Strack栈</span><br><span class="line">    private Stack&lt;ArithmeticExpression&gt; stack&#x3D;new Stack&lt;ArithmeticExpression&gt;();</span><br><span class="line"></span><br><span class="line">    public Calculator(String express) &#123;</span><br><span class="line">        &#x2F;&#x2F;声明2个变量，临时存储运算符左右两边的数字解释器</span><br><span class="line">        ArithmeticExpression expression1,expression2;</span><br><span class="line">        &#x2F;&#x2F;根据空格分割字符串</span><br><span class="line">        String[] args&#x3D;express.split(&quot; &quot;);</span><br><span class="line">        &#x2F;&#x2F;循环数组</span><br><span class="line">        for (int i &#x3D; 0; i &lt;args.length ; i++) &#123;</span><br><span class="line">            switch (args[i].charAt(0))&#123;</span><br><span class="line">                case &#39;+&#39;:&#x2F;&#x2F;如果是+号</span><br><span class="line">                    expression1&#x3D;stack.pop();</span><br><span class="line">                    expression2&#x3D;new NumExpression(Integer.valueOf(args[++i]));</span><br><span class="line">                    stack.push(new AdditionExpression(expression1,expression2));</span><br><span class="line">                    break;</span><br><span class="line">                default: &#x2F;&#x2F;如果为数字</span><br><span class="line">                    stack.push(new NumExpression(Integer.valueOf(args[i])));</span><br><span class="line">                    break;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public int calculate()&#123;</span><br><span class="line">        return stack.pop().interpret();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>测试类</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package InterpreterMode;</span><br><span class="line"></span><br><span class="line">import StrategyMode.CalculateStrategy;</span><br><span class="line"></span><br><span class="line">public class Client &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        Calculator calculator&#x3D;new Calculator(&quot;11 + 22 + 22 + 33&quot;);</span><br><span class="line">        System.out.println(calculator.calculate());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="执行结果"><a href="#执行结果" class="headerlink" title="执行结果"></a>执行结果</h3><img src="/2020/06/29/%E8%A7%A3%E9%87%8A%E5%99%A8%E6%A8%A1%E5%BC%8F/jshiqi.png" class="" title="执行结果">
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p><strong>优点：</strong></p>
+<p>灵活的拓展性，当我们相对文法规则进行拓展延伸时，只需要增加相应的非终结符解释器，并在构建抽象语法树时，使用到新增的解释器对象进行具体的解释即可，非常方便</p>
+<p><strong>缺点：</strong></p>
+<p>因为对于每一条文法都可以对应至少一个解释器，其会生成大量的类，导致后期维护困难；同时，对于过于复杂的文法，构建其抽象语法树会显得异常繁琐，甚至有可能会出现需要构建多棵抽象语法树的情况，因此，对于复杂的文法并不推荐解释器模式</p>
+]]></content>
+      <categories>
+        <category>Android</category>
+      </categories>
+      <tags>
+        <tag>Android</tag>
+        <tag>编码规范</tag>
+        <tag>设计模式</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>责任链模式</title>
+    <url>/2020/05/05/%E8%B4%A3%E4%BB%BB%E9%93%BE%E6%A8%A1%E5%BC%8F/</url>
+    <content><![CDATA[<p>使编程更有灵活性-责任链模式</p>
+<a id="more"></a>
+
+<h2 id="模式简介"><a href="#模式简介" class="headerlink" title="模式简介"></a>模式简介</h2><p>定义：使多个对象都有机会处理请求，从而避免了请求的发送者和接受者之间的耦合关系。将这些对象连成一条链，并沿着这条链传递该请求，直到有对象处理它为止。</p>
+<h2 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h2><p>多个对象可以处理同一请求，但由哪个对象处理则在运行时动态决定。</p>
+<p>在请求处理者不明确的情况下向多个对象中的一个提交一个请求。</p>
+<p>需要动态指定一组对象处理请求。</p>
+<h2 id="简单实现"><a href="#简单实现" class="headerlink" title="简单实现"></a>简单实现</h2><p><strong>Leader抽象类</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package ChainOfResponsMode;</span><br><span class="line"></span><br><span class="line">public abstract class Leader &#123;</span><br><span class="line">    protected Leader nextHandler;&#x2F;&#x2F;上一级领导处理者</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F;处理报账请求</span><br><span class="line">    public final void handlerRequest(int money)&#123;</span><br><span class="line">        if(money &lt;&#x3D; limit())&#123;</span><br><span class="line">            handler(money);</span><br><span class="line">        &#125;else&#123;</span><br><span class="line">            if(null!&#x3D;nextHandler)&#123;</span><br><span class="line">                nextHandler.handlerRequest(money);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F;自身能批复的额度权限</span><br><span class="line">    public abstract int limit();</span><br><span class="line">    &#x2F;&#x2F;处理报账行为</span><br><span class="line">    public abstract void handler(int m);</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>组长类</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">public class GroupLeader extends Leader &#123;</span><br><span class="line">    public int limit() &#123;</span><br><span class="line">        return 1000;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void handler(int m) &#123;</span><br><span class="line">        System.out.println(&quot;组长批复&quot;+m+&quot;元&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>主管类</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package ChainOfResponsMode;</span><br><span class="line"></span><br><span class="line">public class Director extends Leader &#123;</span><br><span class="line">    public int limit() &#123;</span><br><span class="line">        return 5000;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void handler(int m) &#123;</span><br><span class="line">        System.out.println(&quot;主管批复&quot;+m+&quot;元&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>经理类</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package ChainOfResponsMode;</span><br><span class="line"></span><br><span class="line">public class Manager extends Leader &#123;</span><br><span class="line">    public int limit() &#123;</span><br><span class="line">        return 10000;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void handler(int m) &#123;</span><br><span class="line">        System.out.println(&quot;经理批复&quot;+m+&quot;元&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>老板类</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package ChainOfResponsMode;</span><br><span class="line"></span><br><span class="line">public class Boss extends Leader &#123;</span><br><span class="line">    public int limit() &#123;</span><br><span class="line">        return Integer.MAX_VALUE;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void handler(int m) &#123;</span><br><span class="line">        System.out.println(&quot;老板批复&quot;+m+&quot;元&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>测试类</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package ChainOfResponsMode;</span><br><span class="line"></span><br><span class="line">public class Client &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        GroupLeader groupLeader&#x3D;new GroupLeader();</span><br><span class="line">        Director director&#x3D;new Director();</span><br><span class="line">        Manager manager&#x3D;new Manager();</span><br><span class="line">        Boss boss&#x3D;new Boss();</span><br><span class="line"></span><br><span class="line">        &#x2F;&#x2F;设置责任链</span><br><span class="line">        groupLeader.nextHandler&#x3D;director;</span><br><span class="line">        director.nextHandler&#x3D;manager;</span><br><span class="line">        manager.nextHandler&#x3D;boss;</span><br><span class="line"></span><br><span class="line">        &#x2F;&#x2F;发起报账申请</span><br><span class="line">        groupLeader.handlerRequest(5000);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="执行结果"><a href="#执行结果" class="headerlink" title="执行结果"></a>执行结果</h3><img src="/2020/05/05/%E8%B4%A3%E4%BB%BB%E9%93%BE%E6%A8%A1%E5%BC%8F/zrlMode.png" class="" title="结果">
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p><strong>优点：</strong></p>
+<p>可以对请求者和处理者关系解耦，提高代码的灵活性。</p>
+<p><strong>缺点：</strong></p>
+<p>最大缺点是对链中请求处理者的遍历，如果处理者太多那么遍历必定会影响性能，特别是在一些递归调用中，要慎重。</p>
+]]></content>
+      <categories>
+        <category>Android</category>
+      </categories>
+      <tags>
+        <tag>Android</tag>
+        <tag>编码规范</tag>
+        <tag>设计模式</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>迭代器模式</title>
+    <url>/2020/07/25/%E8%BF%AD%E4%BB%A3%E5%99%A8%E6%A8%A1%E5%BC%8F/</url>
+    <content><![CDATA[<p>解决问题的“第三者”-迭代器模式</p>
+<a id="more"></a>
+
+<h2 id="模式定义"><a href="#模式定义" class="headerlink" title="模式定义"></a>模式定义</h2><p>提供一种方法顺序访问一个容器对象中的各个元素，而又不需要暴露该对象的内部表示</p>
+<h2 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h2><p>遍历一个容器对象时</p>
+<h2 id="简单实现"><a href="#简单实现" class="headerlink" title="简单实现"></a>简单实现</h2><p><strong>具体迭代器类（实现迭代器接口-Iterator）</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package IteratorMode;</span><br><span class="line"></span><br><span class="line">import java.util.ArrayList;</span><br><span class="line">import java.util.Iterator;</span><br><span class="line">import java.util.List;</span><br><span class="line"></span><br><span class="line">public class ConcreteIterator&lt;T&gt; implements Iterator&lt;T&gt; &#123;</span><br><span class="line">    private List&lt;T&gt; list&#x3D;new ArrayList&lt;T&gt;();</span><br><span class="line">    private int cursor&#x3D;0;</span><br><span class="line">    public ConcreteIterator(List&lt;T&gt; list) &#123;</span><br><span class="line">        this.list &#x3D; list;</span><br><span class="line">    &#125;</span><br><span class="line">    public boolean hasNext() &#123;</span><br><span class="line">        return cursor!&#x3D;list.size();</span><br><span class="line">    &#125;</span><br><span class="line">    public T next() &#123;</span><br><span class="line">        T obj&#x3D;null;</span><br><span class="line">        if(this.hasNext())&#123;</span><br><span class="line">            obj&#x3D;this.list.get(cursor++);</span><br><span class="line">        &#125;</span><br><span class="line">        return obj;</span><br><span class="line">    &#125;</span><br><span class="line">    public void remove() &#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>容器接口</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package IteratorMode;</span><br><span class="line"></span><br><span class="line">import java.util.Iterator;</span><br><span class="line"></span><br><span class="line">public interface Aggregate&lt;T&gt; &#123;</span><br><span class="line">    &#x2F;&#x2F;添加一个元素</span><br><span class="line">    void add(T obj);</span><br><span class="line">    &#x2F;&#x2F;移除一个元素</span><br><span class="line">    void remove(T obj);</span><br><span class="line">    &#x2F;&#x2F;获取迭代器对象</span><br><span class="line">    Iterator&lt;T&gt; iterator();</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>具体容器类</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package IteratorMode;</span><br><span class="line"></span><br><span class="line">import java.util.ArrayList;</span><br><span class="line">import java.util.Iterator;</span><br><span class="line">import java.util.List;</span><br><span class="line"></span><br><span class="line">public class ConcreteAggregate&lt;T&gt; implements Aggregate&lt;T&gt; &#123;</span><br><span class="line">    public List&lt;T&gt; list&#x3D;new ArrayList&lt;T&gt;();</span><br><span class="line">    public void add(T obj) &#123;</span><br><span class="line">        list.add(obj);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void remove(T obj) &#123;</span><br><span class="line">        list.remove(obj);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public Iterator&lt;T&gt; iterator() &#123;</span><br><span class="line">        return new ConcreteIterator&lt;T&gt;(list);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>客户类</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package IteratorMode;</span><br><span class="line"></span><br><span class="line">import java.util.Iterator;</span><br><span class="line"></span><br><span class="line">public class Client &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        Aggregate&lt;String&gt; a&#x3D;new ConcreteAggregate&lt;String&gt;();</span><br><span class="line">        a.add(&quot;Aige&quot;);</span><br><span class="line">        a.add(&quot;Studio&#x2F;n&quot;);</span><br><span class="line">        a.add(&quot;SM&quot;);</span><br><span class="line">        a.add(&quot; Brother&quot;);</span><br><span class="line">        Iterator iterator&#x3D;a.iterator();</span><br><span class="line">        while (iterator.hasNext())&#123;</span><br><span class="line">            System.out.println(iterator.next());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>执行结果</strong></p>
+<img src="/2020/07/25/%E8%BF%AD%E4%BB%A3%E5%99%A8%E6%A8%A1%E5%BC%8F/ccc.png" class="" title="执行结果">
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p><strong>优点</strong>：</p>
+<p>​    支持以不同方式去遍历一个容器对象，也可以有多个遍历，弱化了容器类与遍历算法之间的关系</p>
+<p><strong>缺点</strong>：</p>
+<p>​    对类文件的增加</p>
+<p><strong>了解即可，应用比较少，基本都有相应的内置实现</strong></p>
+]]></content>
+      <categories>
+        <category>Android</category>
+      </categories>
+      <tags>
+        <tag>Android</tag>
+        <tag>编码规范</tag>
+        <tag>设计模式</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>防止SSH暴力破解-fail2ban</title>
+    <url>/2020/02/04/%E9%98%B2%E6%AD%A2SSH%E6%9A%B4%E5%8A%9B%E7%A0%B4%E8%A7%A3-fail2ban/</url>
+    <content><![CDATA[<p>防止SSH被暴力破解</p>
+<a id="more"></a>
+
+<h2 id="系统环境"><a href="#系统环境" class="headerlink" title="系统环境"></a>系统环境</h2><p>操作系统:centOS 7x64</p>
+<h2 id="操作步骤"><a href="#操作步骤" class="headerlink" title="操作步骤"></a>操作步骤</h2><h3 id="安装EPEL源"><a href="#安装EPEL源" class="headerlink" title="安装EPEL源"></a>安装EPEL源</h3><figure class="highlight plain"><figcaption><span>-y install epel-release.noarch ~~~</span></figcaption><table><tr><td class="code"><pre><span class="line">yum -y install epel-release.noarch</span><br></pre></td></tr></table></figure>
+
+<h3 id="安装fail2ban"><a href="#安装fail2ban" class="headerlink" title="安装fail2ban"></a>安装fail2ban</h3><p>centOS 7默认使用了firewalld 作为防火墙,所以这里我们需要安装支持firewalld的fail2ban版本</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">yum -y install fail2ban-firewalld fail2ban-systemd</span><br></pre></td></tr></table></figure>
+
+<h3 id="设置fial2ban"><a href="#设置fial2ban" class="headerlink" title="设置fial2ban"></a>设置fial2ban</h3><p>配置相关文件</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">vi &#x2F;etc&#x2F;fail2ban&#x2F;jail.local</span><br></pre></td></tr></table></figure>
+
+<p>添加以下内容</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[sshd]</span><br><span class="line">#开关</span><br><span class="line">enabled &#x3D; true</span><br><span class="line">#过滤器</span><br><span class="line">filter &#x3D; sshd</span><br><span class="line">#端口号</span><br><span class="line">port &#x3D; 22</span><br><span class="line">#ban时常 30天</span><br><span class="line">bantime  &#x3D; 2592000</span><br><span class="line">#检索时常 5分钟</span><br><span class="line">findtime  &#x3D; 300</span><br><span class="line">#检索时间内错误次数</span><br><span class="line">maxretry &#x3D; 3</span><br></pre></td></tr></table></figure>
+
+<h2 id="常用命令"><a href="#常用命令" class="headerlink" title="常用命令"></a>常用命令</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#启动并设置开机启动</span><br><span class="line">systemctl enable fail2ban</span><br><span class="line">systemctl start fail2ban</span><br><span class="line"></span><br><span class="line">#查看拦截日志</span><br><span class="line">fail2ban-client status sshd</span><br></pre></td></tr></table></figure>
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>这里只使用了很小一部分功能,还有其他的配置及命令这里就不写出来了.</p>
+<p>大家有兴趣的话可以去浏览官方文档</p>
+<p>官网地址:<a href="https://www.fail2ban.org/wiki/index.php/Main_Page">https://www.fail2ban.org/wiki/index.php/Main_Page</a></p>
+]]></content>
+      <categories>
+        <category>Linux</category>
+      </categories>
+      <tags>
+        <tag>服务器</tag>
+        <tag>运维</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>面对对象6大原则</title>
+    <url>/2019/08/27/%E9%9D%A2%E5%AF%B9%E5%AF%B9%E8%B1%A16%E5%A4%A7%E5%8E%9F%E5%88%99/</url>
+    <content><![CDATA[<p>面对对象编程时的代码规范和标准，之后有想到的还会有补充</p>
+<a id="more"></a>
+
+<h1 id="总述"><a href="#总述" class="headerlink" title="总述"></a>总述</h1><ol>
+<li><p>单一职责原则</p>
+</li>
+<li><p>开闭原则</p>
+</li>
+<li><p>里氏替换原则</p>
+</li>
+<li><p>依赖倒置原则</p>
+</li>
+<li><p>接口隔离原则</p>
+<p><strong>以上5原则也被统称为SOLID原则</strong></p>
+</li>
+<li><p>迪米特原则</p>
+</li>
+</ol>
+<h2 id="单一职责原则"><a href="#单一职责原则" class="headerlink" title="单一职责原则"></a>单一职责原则</h2><p>尽量保证同一类中函数职责相近，根据经验判断。</p>
+<h2 id="开闭原则"><a href="#开闭原则" class="headerlink" title="开闭原则"></a>开闭原则</h2><p>软件中的类、函数、模块应该对于拓展是开放的，但是对于修改是封闭的。修改的时候尽量通过拓展方式来修改，例如接口、继承这种抽象方式</p>
+<h2 id="里氏替换原则"><a href="#里氏替换原则" class="headerlink" title="里氏替换原则"></a>里氏替换原则</h2><p>所有引用基类的地方必须能够透明的使用其子类对象</p>
+<p>例：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//窗口类</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> Window&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">show</span><span class="params">(View child)</span></span>&#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">View</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> abstarct <span class="keyword">void</span> <span class="title">draw</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">measure</span><span class="params">(<span class="keyword">int</span> width,<span class="keyword">int</span> height)</span></span>&#123;</span><br><span class="line">        <span class="comment">//测量视图大小</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//文本控件类实现</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> TextView extends View&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">show</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="comment">//绘制文本</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//ImageView类实现</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> ImageView extends View&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">show</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="comment">//绘制图像</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>优点：</p>
+<ol>
+<li>代码重用，减少创建类的成本，每个子类有拥有父类的方法和属性</li>
+<li>子类和父类相似，但是又有不同点</li>
+<li>提高代码可拓展性</li>
+</ol>
+<p>缺点：</p>
+<ol>
+<li>继承是侵入性的，只要继承就必须拥有父类的方法和属性</li>
+<li>可能造成子类代码的冗余、灵活性降低，因为子类拥有父类的方法和属性</li>
+</ol>
+<h2 id="依赖倒置原则"><a href="#依赖倒置原则" class="headerlink" title="依赖倒置原则"></a>依赖倒置原则</h2><p>模块间的依赖通过抽象发生，实现类之间不发生直接的依赖关系，其依赖关系是通过接口或者抽象类产生的。</p>
+<h2 id="接口隔离原则"><a href="#接口隔离原则" class="headerlink" title="接口隔离原则"></a>接口隔离原则</h2><p>客户端不应依赖他不需要的接口。</p>
+<p>类间的依赖关系应该建立在最小的接口上。</p>
+<p>将非常庞大的、臃肿的接口拆分成更小或者更具体的接口，解开系统耦合，从而容易重构、更改和重新部署</p>
+<h2 id="迪米特原则"><a href="#迪米特原则" class="headerlink" title="迪米特原则"></a>迪米特原则</h2><p>一个对象一个应该对其他对象有最少的了解。</p>
+<p>通俗的将，一个类应该对自己需要耦合或调用的类知道的最少，类的内部如何实现与调用者或者依赖者没关系，调用者或者依赖者只需要知道它需要的方法即可，其他的一律不用管。类与类之间的关系越密切，耦合度越大，当一个类发生改变时，对另一个类的影响也越大。</p>
+]]></content>
+      <categories>
+        <category>Android</category>
+      </categories>
+      <tags>
+        <tag>Android</tag>
+        <tag>编码规范</tag>
+      </tags>
+  </entry>
+</search>
