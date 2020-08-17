@@ -89,6 +89,25 @@
       </tags>
   </entry>
   <entry>
+    <title>Hexo语法记录</title>
+    <url>/2019/07/15/Hexo%E8%AF%AD%E6%B3%95%E8%AE%B0%E5%BD%95/</url>
+    <content><![CDATA[<p>平常使用Hexo博客框架时所用到的语法，随时更新</p>
+<a id="more"></a>
+
+<h1 id="Hexo相关语法"><a href="#Hexo相关语法" class="headerlink" title="Hexo相关语法"></a>Hexo相关语法</h1><p>部署Hexo框架请参考 <a href="https://hexo.io/zh-cn/docs/index.html">官方文档</a></p>
+<p>我这里部署的是git+node.js+git.io的方式</p>
+<h2 id="创建新博客文章"><a href="#创建新博客文章" class="headerlink" title="创建新博客文章"></a>创建新博客文章</h2><p>在Hexo目录打开命令行，输入：<strong>hexo new “博客文章名字”</strong> 即可创建新博客文章</p>
+<h2 id="将博客渲染成静态html文件"><a href="#将博客渲染成静态html文件" class="headerlink" title="将博客渲染成静态html文件"></a>将博客渲染成静态html文件</h2><p>Hexo目录打开命令行 ，输入：<strong>hexo generate （也可以简写 hexo g）</strong>即可生成静态文件</p>
+<h2 id="部署博客"><a href="#部署博客" class="headerlink" title="部署博客"></a>部署博客</h2><p>Hexo目录打开命令行，输入： <strong>hexo deploy （也可以简写成 hexo d）</strong>即可生成</p>
+]]></content>
+      <categories>
+        <category>博客相关</category>
+      </categories>
+      <tags>
+        <tag>博客，语法</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Git 右键菜单添加Git Bash Here</title>
     <url>/2019/12/21/Git-%E5%8F%B3%E9%94%AE%E8%8F%9C%E5%8D%95%E6%B7%BB%E5%8A%A0Git-Bash-Here/</url>
     <content><![CDATA[<p>通过修改注册表的方式添加右键菜单  Git Bash Here</p>
@@ -120,25 +139,6 @@
         <tag>注册表</tag>
         <tag>右键菜单</tag>
         <tag>Windows</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Hexo语法记录</title>
-    <url>/2019/07/15/Hexo%E8%AF%AD%E6%B3%95%E8%AE%B0%E5%BD%95/</url>
-    <content><![CDATA[<p>平常使用Hexo博客框架时所用到的语法，随时更新</p>
-<a id="more"></a>
-
-<h1 id="Hexo相关语法"><a href="#Hexo相关语法" class="headerlink" title="Hexo相关语法"></a>Hexo相关语法</h1><p>部署Hexo框架请参考 <a href="https://hexo.io/zh-cn/docs/index.html">官方文档</a></p>
-<p>我这里部署的是git+node.js+git.io的方式</p>
-<h2 id="创建新博客文章"><a href="#创建新博客文章" class="headerlink" title="创建新博客文章"></a>创建新博客文章</h2><p>在Hexo目录打开命令行，输入：<strong>hexo new “博客文章名字”</strong> 即可创建新博客文章</p>
-<h2 id="将博客渲染成静态html文件"><a href="#将博客渲染成静态html文件" class="headerlink" title="将博客渲染成静态html文件"></a>将博客渲染成静态html文件</h2><p>Hexo目录打开命令行 ，输入：<strong>hexo generate （也可以简写 hexo g）</strong>即可生成静态文件</p>
-<h2 id="部署博客"><a href="#部署博客" class="headerlink" title="部署博客"></a>部署博客</h2><p>Hexo目录打开命令行，输入： <strong>hexo deploy （也可以简写成 hexo d）</strong>即可生成</p>
-]]></content>
-      <categories>
-        <category>博客相关</category>
-      </categories>
-      <tags>
-        <tag>博客，语法</tag>
       </tags>
   </entry>
   <entry>
@@ -361,6 +361,47 @@
       </tags>
   </entry>
   <entry>
+    <title>原型模式</title>
+    <url>/2020/03/01/%E5%8E%9F%E5%9E%8B%E6%A8%A1%E5%BC%8F/</url>
+    <content><![CDATA[<p>使程序运行更高效-原型模式</p>
+<p>原型模式多用于创建复杂的或者构造耗时的实例，因为这种情况下，复制一个已经存在的实例可使程序运行更高效。</p>
+<a id="more"></a>
+
+<h3 id="原型模式的定义"><a href="#原型模式的定义" class="headerlink" title="原型模式的定义"></a>原型模式的定义</h3><p>用原型实例指定创建对象的种类，并通过复制这些原型创建新的对象。</p>
+<h3 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h3><ol>
+<li>类初始化需要消耗非常多的资源，这个资源包括数据，硬件资源等，通过原型复制避免这些消耗。</li>
+<li>通过new产生一个对象需要非常繁琐的数据准备或访问权限，这时可以使用原型模式。</li>
+<li>一个对象需要提供给其他对象访问，而且各个调用者可能都需要修改其值时，可以考虑使用原型模式复制多个对象供调用者，提供保护性拷贝</li>
+</ol>
+<p>注意：实现Cloneable接口的原型模式在调用clone函数构造实例并不一定比new对象快。只有在new对象时候非常耗时或者繁琐的时候，通过clone函数才会获得效率上的提升。</p>
+<h3 id="简单实现"><a href="#简单实现" class="headerlink" title="简单实现"></a>简单实现</h3><p><strong>文档类 JavaBean</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package Prototype;</span><br><span class="line"></span><br><span class="line">import java.util.ArrayList;</span><br><span class="line"></span><br><span class="line">public class WordDocument implements Cloneable&#123;</span><br><span class="line">    &#x2F;&#x2F;文本</span><br><span class="line">    private String mText;</span><br><span class="line">    &#x2F;&#x2F;图片名列表</span><br><span class="line">    private ArrayList&lt;String&gt; mImages&#x3D;new ArrayList&lt;String&gt;();</span><br><span class="line"></span><br><span class="line">    public WordDocument() &#123;</span><br><span class="line">        System.out.println(&quot;-----------构造函数-----------&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    protected WordDocument clone()&#123;</span><br><span class="line">        try &#123;</span><br><span class="line">            WordDocument document&#x3D;(WordDocument) super.clone();</span><br><span class="line">            document.mImages&#x3D;this.mImages;</span><br><span class="line">            document.mText&#x3D;this.mText;</span><br><span class="line">            return document;</span><br><span class="line">        &#125;catch (Exception e)&#123;</span><br><span class="line">        &#125;</span><br><span class="line">        return null;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public String getmText() &#123;</span><br><span class="line">        return mText;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void setmText(String mText) &#123;</span><br><span class="line">        this.mText &#x3D; mText;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public ArrayList&lt;String&gt; getmImages() &#123;</span><br><span class="line">        return mImages;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void setmImages(ArrayList&lt;String&gt; mImages) &#123;</span><br><span class="line">        this.mImages &#x3D; mImages;</span><br><span class="line">    &#125;</span><br><span class="line">    public void addImg(String name)&#123;</span><br><span class="line">        this.mImages.add(name);</span><br><span class="line">    &#125;</span><br><span class="line">    &#x2F;&#x2F;打印文档内容</span><br><span class="line">    public void showDocument()&#123;</span><br><span class="line">        System.out.println(&quot;-------word Content Start------&quot;);</span><br><span class="line">        System.out.println(&quot;text:&quot;+mText);</span><br><span class="line">        System.out.println(&quot;imgList:&quot;);</span><br><span class="line">        for (String name:mImages) &#123;</span><br><span class="line">            System.out.println(&quot;imgName:&quot;+name);</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(&quot;---------word Content End-------&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>演示端</strong>：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package Prototype;</span><br><span class="line"></span><br><span class="line">public class Client &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        WordDocument document&#x3D;new WordDocument();</span><br><span class="line">        document.setmText(&quot;这个是文档&quot;);</span><br><span class="line">        document.addImg(&quot;图片1&quot;);</span><br><span class="line">        document.addImg(&quot;图片2&quot;);</span><br><span class="line">        document.addImg(&quot;图片3&quot;);</span><br><span class="line">        document.showDocument();</span><br><span class="line"></span><br><span class="line">        &#x2F;&#x2F;以原始文档为原型，拷贝一份副本</span><br><span class="line">        WordDocument doc2&#x3D; document.clone();</span><br><span class="line">        doc2.showDocument();</span><br><span class="line">        doc2.setmText(&quot;这个是修改过的副本文档&quot;);</span><br><span class="line">        doc2.showDocument();</span><br><span class="line"></span><br><span class="line">        document.showDocument();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>执行结果：</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">-----------构造函数-----------</span><br><span class="line">-------word Content Start------</span><br><span class="line">text:这个是文档</span><br><span class="line">imgList:</span><br><span class="line">imgName:图片1</span><br><span class="line">imgName:图片2</span><br><span class="line">imgName:图片3</span><br><span class="line">---------word Content End-------</span><br><span class="line">-------word Content Start------</span><br><span class="line">text:这个是文档</span><br><span class="line">imgList:</span><br><span class="line">imgName:图片1</span><br><span class="line">imgName:图片2</span><br><span class="line">imgName:图片3</span><br><span class="line">---------word Content End-------</span><br><span class="line">-------word Content Start------</span><br><span class="line">text:这个是修改过的副本文档</span><br><span class="line">imgList:</span><br><span class="line">imgName:图片1</span><br><span class="line">imgName:图片2</span><br><span class="line">imgName:图片3</span><br><span class="line">---------word Content End-------</span><br><span class="line">-------word Content Start------</span><br><span class="line">text:这个是文档</span><br><span class="line">imgList:</span><br><span class="line">imgName:图片1</span><br><span class="line">imgName:图片2</span><br><span class="line">imgName:图片3</span><br><span class="line">---------word Content End-------</span><br><span class="line"></span><br><span class="line">Process finished with exit code 0</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>由上面可以看到，doc2是通过document.clone()创建的，并且第一次输出的时候2个对象的输出是一样的。而且doc2修改文本内容后不会改变影响document对象的文本内容，这就保证了document的安全性。还需要注意的是，<strong>通过clone拷贝对象的时候是不会执行构造函数的</strong></p>
+<h3 id="深拷贝和浅拷贝"><a href="#深拷贝和浅拷贝" class="headerlink" title="深拷贝和浅拷贝"></a>深拷贝和浅拷贝</h3><p>上面的拷贝被称为浅拷贝，也称作影子拷贝。并不是将所有字段都重新构造了一份，而是通过副本文档的字段引用原始文档的字段。</p>
+<p>因此，如果A引用B，那么无论修改A还是B对象，另一个对象都会随之改变。但我们大多数时候都需要A/B对象改变的时候另一个对象不会改变，那么我们如何避免这种情况呢，这边就引出了新的概念：<strong>深拷贝</strong></p>
+<p>所谓深拷贝，即在拷贝对象时，对于引用型的字段也要采用拷贝的形式，而不是单纯的引用形式。这里就借用上面的demo代码做相关改动，使浅拷贝变成深拷贝。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F;深拷贝</span><br><span class="line">@Override</span><br><span class="line">   protected WordDocument clone()&#123;</span><br><span class="line">       try &#123;</span><br><span class="line">           WordDocument document&#x3D;(WordDocument) super.clone();</span><br><span class="line">           document.mImages&#x3D;(ArrayList&lt;String&gt;) this.mImages.clone();</span><br><span class="line">           document.mText&#x3D;this.mText;</span><br><span class="line">           return document;</span><br><span class="line">       &#125;catch (Exception e)&#123;</span><br><span class="line">       &#125;</span><br><span class="line">       return null;</span><br><span class="line">   &#125;</span><br><span class="line">   </span><br><span class="line">&#x2F;&#x2F;浅拷贝</span><br><span class="line"> @Override</span><br><span class="line">   protected WordDocument clone()&#123;</span><br><span class="line">       try &#123;</span><br><span class="line">           WordDocument document&#x3D;(WordDocument) super.clone();</span><br><span class="line">           document.mImages&#x3D;this.mImages;</span><br><span class="line">           document.mText&#x3D;this.mText;</span><br><span class="line">           return document;</span><br><span class="line">       &#125;catch (Exception e)&#123;</span><br><span class="line">       &#125;</span><br><span class="line">       return null;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们可以看到上面的改动对比：深拷贝时调用的clone函数,将中间mImages指向this.mImages的拷贝，而不是它的本身。这样在修改doc2对象时调用addImg()函数就不会影响到document对象了。</p>
+<p><strong>so 我们在平时使用的时候尽量要使用深拷贝，以免造成操作副本时影响原始对象的问题</strong></p>
+]]></content>
+      <categories>
+        <category>Android</category>
+      </categories>
+      <tags>
+        <tag>Android</tag>
+        <tag>编码规范</tag>
+        <tag>设计模式</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>命令模式</title>
     <url>/2020/05/21/%E5%91%BD%E4%BB%A4%E6%A8%A1%E5%BC%8F/</url>
     <content><![CDATA[<p>让程序通畅运行-命令模式</p>
@@ -404,47 +445,6 @@
       </tags>
   </entry>
   <entry>
-    <title>原型模式</title>
-    <url>/2020/03/01/%E5%8E%9F%E5%9E%8B%E6%A8%A1%E5%BC%8F/</url>
-    <content><![CDATA[<p>使程序运行更高效-原型模式</p>
-<p>原型模式多用于创建复杂的或者构造耗时的实例，因为这种情况下，复制一个已经存在的实例可使程序运行更高效。</p>
-<a id="more"></a>
-
-<h3 id="原型模式的定义"><a href="#原型模式的定义" class="headerlink" title="原型模式的定义"></a>原型模式的定义</h3><p>用原型实例指定创建对象的种类，并通过复制这些原型创建新的对象。</p>
-<h3 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h3><ol>
-<li>类初始化需要消耗非常多的资源，这个资源包括数据，硬件资源等，通过原型复制避免这些消耗。</li>
-<li>通过new产生一个对象需要非常繁琐的数据准备或访问权限，这时可以使用原型模式。</li>
-<li>一个对象需要提供给其他对象访问，而且各个调用者可能都需要修改其值时，可以考虑使用原型模式复制多个对象供调用者，提供保护性拷贝</li>
-</ol>
-<p>注意：实现Cloneable接口的原型模式在调用clone函数构造实例并不一定比new对象快。只有在new对象时候非常耗时或者繁琐的时候，通过clone函数才会获得效率上的提升。</p>
-<h3 id="简单实现"><a href="#简单实现" class="headerlink" title="简单实现"></a>简单实现</h3><p><strong>文档类 JavaBean</strong></p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package Prototype;</span><br><span class="line"></span><br><span class="line">import java.util.ArrayList;</span><br><span class="line"></span><br><span class="line">public class WordDocument implements Cloneable&#123;</span><br><span class="line">    &#x2F;&#x2F;文本</span><br><span class="line">    private String mText;</span><br><span class="line">    &#x2F;&#x2F;图片名列表</span><br><span class="line">    private ArrayList&lt;String&gt; mImages&#x3D;new ArrayList&lt;String&gt;();</span><br><span class="line"></span><br><span class="line">    public WordDocument() &#123;</span><br><span class="line">        System.out.println(&quot;-----------构造函数-----------&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    protected WordDocument clone()&#123;</span><br><span class="line">        try &#123;</span><br><span class="line">            WordDocument document&#x3D;(WordDocument) super.clone();</span><br><span class="line">            document.mImages&#x3D;this.mImages;</span><br><span class="line">            document.mText&#x3D;this.mText;</span><br><span class="line">            return document;</span><br><span class="line">        &#125;catch (Exception e)&#123;</span><br><span class="line">        &#125;</span><br><span class="line">        return null;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public String getmText() &#123;</span><br><span class="line">        return mText;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void setmText(String mText) &#123;</span><br><span class="line">        this.mText &#x3D; mText;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public ArrayList&lt;String&gt; getmImages() &#123;</span><br><span class="line">        return mImages;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void setmImages(ArrayList&lt;String&gt; mImages) &#123;</span><br><span class="line">        this.mImages &#x3D; mImages;</span><br><span class="line">    &#125;</span><br><span class="line">    public void addImg(String name)&#123;</span><br><span class="line">        this.mImages.add(name);</span><br><span class="line">    &#125;</span><br><span class="line">    &#x2F;&#x2F;打印文档内容</span><br><span class="line">    public void showDocument()&#123;</span><br><span class="line">        System.out.println(&quot;-------word Content Start------&quot;);</span><br><span class="line">        System.out.println(&quot;text:&quot;+mText);</span><br><span class="line">        System.out.println(&quot;imgList:&quot;);</span><br><span class="line">        for (String name:mImages) &#123;</span><br><span class="line">            System.out.println(&quot;imgName:&quot;+name);</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(&quot;---------word Content End-------&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>演示端</strong>：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package Prototype;</span><br><span class="line"></span><br><span class="line">public class Client &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        WordDocument document&#x3D;new WordDocument();</span><br><span class="line">        document.setmText(&quot;这个是文档&quot;);</span><br><span class="line">        document.addImg(&quot;图片1&quot;);</span><br><span class="line">        document.addImg(&quot;图片2&quot;);</span><br><span class="line">        document.addImg(&quot;图片3&quot;);</span><br><span class="line">        document.showDocument();</span><br><span class="line"></span><br><span class="line">        &#x2F;&#x2F;以原始文档为原型，拷贝一份副本</span><br><span class="line">        WordDocument doc2&#x3D; document.clone();</span><br><span class="line">        doc2.showDocument();</span><br><span class="line">        doc2.setmText(&quot;这个是修改过的副本文档&quot;);</span><br><span class="line">        doc2.showDocument();</span><br><span class="line"></span><br><span class="line">        document.showDocument();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p><strong>执行结果：</strong></p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">-----------构造函数-----------</span><br><span class="line">-------word Content Start------</span><br><span class="line">text:这个是文档</span><br><span class="line">imgList:</span><br><span class="line">imgName:图片1</span><br><span class="line">imgName:图片2</span><br><span class="line">imgName:图片3</span><br><span class="line">---------word Content End-------</span><br><span class="line">-------word Content Start------</span><br><span class="line">text:这个是文档</span><br><span class="line">imgList:</span><br><span class="line">imgName:图片1</span><br><span class="line">imgName:图片2</span><br><span class="line">imgName:图片3</span><br><span class="line">---------word Content End-------</span><br><span class="line">-------word Content Start------</span><br><span class="line">text:这个是修改过的副本文档</span><br><span class="line">imgList:</span><br><span class="line">imgName:图片1</span><br><span class="line">imgName:图片2</span><br><span class="line">imgName:图片3</span><br><span class="line">---------word Content End-------</span><br><span class="line">-------word Content Start------</span><br><span class="line">text:这个是文档</span><br><span class="line">imgList:</span><br><span class="line">imgName:图片1</span><br><span class="line">imgName:图片2</span><br><span class="line">imgName:图片3</span><br><span class="line">---------word Content End-------</span><br><span class="line"></span><br><span class="line">Process finished with exit code 0</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>由上面可以看到，doc2是通过document.clone()创建的，并且第一次输出的时候2个对象的输出是一样的。而且doc2修改文本内容后不会改变影响document对象的文本内容，这就保证了document的安全性。还需要注意的是，<strong>通过clone拷贝对象的时候是不会执行构造函数的</strong></p>
-<h3 id="深拷贝和浅拷贝"><a href="#深拷贝和浅拷贝" class="headerlink" title="深拷贝和浅拷贝"></a>深拷贝和浅拷贝</h3><p>上面的拷贝被称为浅拷贝，也称作影子拷贝。并不是将所有字段都重新构造了一份，而是通过副本文档的字段引用原始文档的字段。</p>
-<p>因此，如果A引用B，那么无论修改A还是B对象，另一个对象都会随之改变。但我们大多数时候都需要A/B对象改变的时候另一个对象不会改变，那么我们如何避免这种情况呢，这边就引出了新的概念：<strong>深拷贝</strong></p>
-<p>所谓深拷贝，即在拷贝对象时，对于引用型的字段也要采用拷贝的形式，而不是单纯的引用形式。这里就借用上面的demo代码做相关改动，使浅拷贝变成深拷贝。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F;深拷贝</span><br><span class="line">@Override</span><br><span class="line">   protected WordDocument clone()&#123;</span><br><span class="line">       try &#123;</span><br><span class="line">           WordDocument document&#x3D;(WordDocument) super.clone();</span><br><span class="line">           document.mImages&#x3D;(ArrayList&lt;String&gt;) this.mImages.clone();</span><br><span class="line">           document.mText&#x3D;this.mText;</span><br><span class="line">           return document;</span><br><span class="line">       &#125;catch (Exception e)&#123;</span><br><span class="line">       &#125;</span><br><span class="line">       return null;</span><br><span class="line">   &#125;</span><br><span class="line">   </span><br><span class="line">&#x2F;&#x2F;浅拷贝</span><br><span class="line"> @Override</span><br><span class="line">   protected WordDocument clone()&#123;</span><br><span class="line">       try &#123;</span><br><span class="line">           WordDocument document&#x3D;(WordDocument) super.clone();</span><br><span class="line">           document.mImages&#x3D;this.mImages;</span><br><span class="line">           document.mText&#x3D;this.mText;</span><br><span class="line">           return document;</span><br><span class="line">       &#125;catch (Exception e)&#123;</span><br><span class="line">       &#125;</span><br><span class="line">       return null;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
-
-<p>我们可以看到上面的改动对比：深拷贝时调用的clone函数,将中间mImages指向this.mImages的拷贝，而不是它的本身。这样在修改doc2对象时调用addImg()函数就不会影响到document对象了。</p>
-<p><strong>so 我们在平时使用的时候尽量要使用深拷贝，以免造成操作副本时影响原始对象的问题</strong></p>
-]]></content>
-      <categories>
-        <category>Android</category>
-      </categories>
-      <tags>
-        <tag>Android</tag>
-        <tag>编码规范</tag>
-        <tag>设计模式</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>备忘录模式</title>
     <url>/2020/07/25/%E5%A4%87%E5%BF%98%E5%BD%95%E6%A8%A1%E5%BC%8F/</url>
     <content><![CDATA[<p>编程中的‘后悔药’-备忘录模式</p>
@@ -477,24 +477,6 @@
 </ol>
 <p><strong>缺点</strong>：</p>
 <pre><code> 消耗资源，如果类的成员变量过多，势必会占用比较大的资源，而且每一次保存都会消耗一定的内存。</code></pre>
-]]></content>
-      <categories>
-        <category>Android</category>
-      </categories>
-      <tags>
-        <tag>Android</tag>
-        <tag>编码规范</tag>
-        <tag>设计模式</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>建造者模式</title>
-    <url>/2019/12/28/%E5%BB%BA%E9%80%A0%E8%80%85%E6%A8%A1%E5%BC%8F/</url>
-    <content><![CDATA[<p>自由拓展你的项目：建造者模式(Builder模式)</p>
-<a id="more"></a>
-
-<h2 id="简单实现"><a href="#简单实现" class="headerlink" title="简单实现"></a>简单实现</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"></span><br></pre></td></tr></table></figure>
-
 ]]></content>
       <categories>
         <category>Android</category>
@@ -583,6 +565,24 @@
       </tags>
   </entry>
   <entry>
+    <title>建造者模式</title>
+    <url>/2019/12/28/%E5%BB%BA%E9%80%A0%E8%80%85%E6%A8%A1%E5%BC%8F/</url>
+    <content><![CDATA[<p>自由拓展你的项目：建造者模式(Builder模式)</p>
+<a id="more"></a>
+
+<h2 id="简单实现"><a href="#简单实现" class="headerlink" title="简单实现"></a>简单实现</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"></span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <categories>
+        <category>Android</category>
+      </categories>
+      <tags>
+        <tag>Android</tag>
+        <tag>编码规范</tag>
+        <tag>设计模式</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>模板方法模式</title>
     <url>/2020/07/25/%E6%A8%A1%E6%9D%BF%E6%96%B9%E6%B3%95%E6%A8%A1%E5%BC%8F/</url>
     <content><![CDATA[<p>抓住问题的核心-模板方法模式</p>
@@ -635,6 +635,47 @@
       </tags>
   </entry>
   <entry>
+    <title>观察者模式</title>
+    <url>/2020/07/04/%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8F/</url>
+    <content><![CDATA[<p>解决、解耦的钥匙-观察者模式</p>
+<a id="more"></a>
+
+<h2 id="模式简介"><a href="#模式简介" class="headerlink" title="模式简介"></a>模式简介</h2><p>定义对象间一种一对多的依赖关系，使得每当一个对象改变状态，则所有依赖于它的对象都会得到通知并被自动更新</p>
+<h2 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h2><ol>
+<li>关联行为场景，需要注意的是，关联行为是可以拆分的，而不是组合关系；</li>
+<li>事件多级触发场景；</li>
+<li>跨系统的消息交换场景，如消息队列、事件总线的处理机制；</li>
+</ol>
+<h2 id="简单实现"><a href="#简单实现" class="headerlink" title="简单实现"></a>简单实现</h2><p><strong>观察者</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package ObserverMode;</span><br><span class="line"></span><br><span class="line">import java.util.Observable;</span><br><span class="line">import java.util.Observer;</span><br><span class="line"></span><br><span class="line">public class Coder implements Observer &#123;</span><br><span class="line">    private String name;</span><br><span class="line"></span><br><span class="line">    public Coder(String name) &#123;</span><br><span class="line">        this.name &#x3D; name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void update(Observable o, Object arg) &#123;</span><br><span class="line">        System.out.println(&quot;hi&quot;+name+&quot;更新了，内容&quot;+arg);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public String toString() &#123;</span><br><span class="line">        return &quot;Coder&#123;&quot; +</span><br><span class="line">                &quot;name&#x3D;&#39;&quot; + name + &#39;\&#39;&#39; +</span><br><span class="line">                &#39;&#125;&#39;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>被观察者</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package ObserverMode;</span><br><span class="line"></span><br><span class="line">import java.util.Observable;</span><br><span class="line"></span><br><span class="line">public class DevTechFrontier extends Observable &#123;</span><br><span class="line">    public void postNewPublication(String content)&#123;</span><br><span class="line">        setChanged();</span><br><span class="line">        notifyObservers(content);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>测试代码</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package ObserverMode;</span><br><span class="line"></span><br><span class="line">public class Test &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        DevTechFrontier devTechFrontier&#x3D;new DevTechFrontier();</span><br><span class="line"></span><br><span class="line">        Coder coder&#x3D;new Coder(&quot;coder&quot;);</span><br><span class="line">        Coder coder1&#x3D;new Coder(&quot;coder1&quot;);</span><br><span class="line">        Coder coder2&#x3D;new Coder(&quot;coder2&quot;);</span><br><span class="line">        Coder coder3&#x3D;new Coder(&quot;coder3&quot;);</span><br><span class="line"></span><br><span class="line">        devTechFrontier.addObserver(coder);</span><br><span class="line">        devTechFrontier.addObserver(coder1);</span><br><span class="line">        devTechFrontier.addObserver(coder2);</span><br><span class="line">        devTechFrontier.addObserver(coder3);</span><br><span class="line"></span><br><span class="line">        devTechFrontier.postNewPublication(&quot;新一期的周报发布了&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="执行结果"><a href="#执行结果" class="headerlink" title="执行结果"></a>执行结果</h3><img src="/2020/07/04/%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8F/ObserverMode.png" class="" title="执行结果">
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>主要作用就是对象解耦，将观察者与被观察者完全隔离，只依赖于Observer和Observable抽象，例如，listview就是运用了Adapter和观察者模式使得它的可拓展性、灵活性非常强，而耦合度却很低。</p>
+<p><strong>优点：</strong></p>
+<ol>
+<li>观察者与被观察者之间是抽象耦合，应对业务变化</li>
+<li>增强系统灵活性、可拓展性</li>
+</ol>
+<p><strong>缺点：</strong></p>
+<p>​        在应用观察者模式是需要考虑一下开发效率以及运行效率的问题，程序中包括一个被观察者，多个观察者、开发和调试等内容会比较复杂，而且在java中消息的通知默认是顺序执行，一个观察者卡顿，会影响整体的执行效率，在这种情况下，一般考虑采用异步的方式。</p>
+]]></content>
+      <categories>
+        <category>Android</category>
+      </categories>
+      <tags>
+        <tag>Android</tag>
+        <tag>编码规范</tag>
+        <tag>设计模式</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>策略模式</title>
     <url>/2020/03/22/%E7%AD%96%E7%95%A5%E6%A8%A1%E5%BC%8F/</url>
     <content><![CDATA[<p>时势造英雄-策略模式</p>
@@ -674,47 +715,6 @@
 <ol>
 <li>随着策略的增加，子类也会变得繁多</li>
 </ol>
-]]></content>
-      <categories>
-        <category>Android</category>
-      </categories>
-      <tags>
-        <tag>Android</tag>
-        <tag>编码规范</tag>
-        <tag>设计模式</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>观察者模式</title>
-    <url>/2020/07/04/%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8F/</url>
-    <content><![CDATA[<p>解决、解耦的钥匙-观察者模式</p>
-<a id="more"></a>
-
-<h2 id="模式简介"><a href="#模式简介" class="headerlink" title="模式简介"></a>模式简介</h2><p>定义对象间一种一对多的依赖关系，使得每当一个对象改变状态，则所有依赖于它的对象都会得到通知并被自动更新</p>
-<h2 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h2><ol>
-<li>关联行为场景，需要注意的是，关联行为是可以拆分的，而不是组合关系；</li>
-<li>事件多级触发场景；</li>
-<li>跨系统的消息交换场景，如消息队列、事件总线的处理机制；</li>
-</ol>
-<h2 id="简单实现"><a href="#简单实现" class="headerlink" title="简单实现"></a>简单实现</h2><p><strong>观察者</strong></p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package ObserverMode;</span><br><span class="line"></span><br><span class="line">import java.util.Observable;</span><br><span class="line">import java.util.Observer;</span><br><span class="line"></span><br><span class="line">public class Coder implements Observer &#123;</span><br><span class="line">    private String name;</span><br><span class="line"></span><br><span class="line">    public Coder(String name) &#123;</span><br><span class="line">        this.name &#x3D; name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void update(Observable o, Object arg) &#123;</span><br><span class="line">        System.out.println(&quot;hi&quot;+name+&quot;更新了，内容&quot;+arg);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public String toString() &#123;</span><br><span class="line">        return &quot;Coder&#123;&quot; +</span><br><span class="line">                &quot;name&#x3D;&#39;&quot; + name + &#39;\&#39;&#39; +</span><br><span class="line">                &#39;&#125;&#39;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p><strong>被观察者</strong></p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package ObserverMode;</span><br><span class="line"></span><br><span class="line">import java.util.Observable;</span><br><span class="line"></span><br><span class="line">public class DevTechFrontier extends Observable &#123;</span><br><span class="line">    public void postNewPublication(String content)&#123;</span><br><span class="line">        setChanged();</span><br><span class="line">        notifyObservers(content);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p><strong>测试代码</strong></p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package ObserverMode;</span><br><span class="line"></span><br><span class="line">public class Test &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        DevTechFrontier devTechFrontier&#x3D;new DevTechFrontier();</span><br><span class="line"></span><br><span class="line">        Coder coder&#x3D;new Coder(&quot;coder&quot;);</span><br><span class="line">        Coder coder1&#x3D;new Coder(&quot;coder1&quot;);</span><br><span class="line">        Coder coder2&#x3D;new Coder(&quot;coder2&quot;);</span><br><span class="line">        Coder coder3&#x3D;new Coder(&quot;coder3&quot;);</span><br><span class="line"></span><br><span class="line">        devTechFrontier.addObserver(coder);</span><br><span class="line">        devTechFrontier.addObserver(coder1);</span><br><span class="line">        devTechFrontier.addObserver(coder2);</span><br><span class="line">        devTechFrontier.addObserver(coder3);</span><br><span class="line"></span><br><span class="line">        devTechFrontier.postNewPublication(&quot;新一期的周报发布了&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<h3 id="执行结果"><a href="#执行结果" class="headerlink" title="执行结果"></a>执行结果</h3><img src="/2020/07/04/%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8F/ObserverMode.png" class="" title="执行结果">
-
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>主要作用就是对象解耦，将观察者与被观察者完全隔离，只依赖于Observer和Observable抽象，例如，listview就是运用了Adapter和观察者模式使得它的可拓展性、灵活性非常强，而耦合度却很低。</p>
-<p><strong>优点：</strong></p>
-<ol>
-<li>观察者与被观察者之间是抽象耦合，应对业务变化</li>
-<li>增强系统灵活性、可拓展性</li>
-</ol>
-<p><strong>缺点：</strong></p>
-<p>​        在应用观察者模式是需要考虑一下开发效率以及运行效率的问题，程序中包括一个被观察者，多个观察者、开发和调试等内容会比较复杂，而且在java中消息的通知默认是顺序执行，一个观察者卡顿，会影响整体的执行效率，在这种情况下，一般考虑采用异步的方式。</p>
 ]]></content>
       <categories>
         <category>Android</category>
@@ -815,6 +815,38 @@
       </tags>
   </entry>
   <entry>
+    <title>防止SSH暴力破解-fail2ban</title>
+    <url>/2020/02/04/%E9%98%B2%E6%AD%A2SSH%E6%9A%B4%E5%8A%9B%E7%A0%B4%E8%A7%A3-fail2ban/</url>
+    <content><![CDATA[<p>防止SSH被暴力破解</p>
+<a id="more"></a>
+
+<h2 id="系统环境"><a href="#系统环境" class="headerlink" title="系统环境"></a>系统环境</h2><p>操作系统:centOS 7x64</p>
+<h2 id="操作步骤"><a href="#操作步骤" class="headerlink" title="操作步骤"></a>操作步骤</h2><h3 id="安装EPEL源"><a href="#安装EPEL源" class="headerlink" title="安装EPEL源"></a>安装EPEL源</h3><figure class="highlight plain"><figcaption><span>-y install epel-release.noarch ~~~</span></figcaption><table><tr><td class="code"><pre><span class="line">yum -y install epel-release.noarch</span><br></pre></td></tr></table></figure>
+
+<h3 id="安装fail2ban"><a href="#安装fail2ban" class="headerlink" title="安装fail2ban"></a>安装fail2ban</h3><p>centOS 7默认使用了firewalld 作为防火墙,所以这里我们需要安装支持firewalld的fail2ban版本</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">yum -y install fail2ban-firewalld fail2ban-systemd</span><br></pre></td></tr></table></figure>
+
+<h3 id="设置fial2ban"><a href="#设置fial2ban" class="headerlink" title="设置fial2ban"></a>设置fial2ban</h3><p>配置相关文件</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">vi &#x2F;etc&#x2F;fail2ban&#x2F;jail.local</span><br></pre></td></tr></table></figure>
+
+<p>添加以下内容</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[sshd]</span><br><span class="line">#开关</span><br><span class="line">enabled &#x3D; true</span><br><span class="line">#过滤器</span><br><span class="line">filter &#x3D; sshd</span><br><span class="line">#端口号</span><br><span class="line">port &#x3D; 22</span><br><span class="line">#ban时常 30天</span><br><span class="line">bantime  &#x3D; 2592000</span><br><span class="line">#检索时常 5分钟</span><br><span class="line">findtime  &#x3D; 300</span><br><span class="line">#检索时间内错误次数</span><br><span class="line">maxretry &#x3D; 3</span><br></pre></td></tr></table></figure>
+
+<h2 id="常用命令"><a href="#常用命令" class="headerlink" title="常用命令"></a>常用命令</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#启动并设置开机启动</span><br><span class="line">systemctl enable fail2ban</span><br><span class="line">systemctl start fail2ban</span><br><span class="line"></span><br><span class="line">#查看拦截日志</span><br><span class="line">fail2ban-client status sshd</span><br></pre></td></tr></table></figure>
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>这里只使用了很小一部分功能,还有其他的配置及命令这里就不写出来了.</p>
+<p>大家有兴趣的话可以去浏览官方文档</p>
+<p>官网地址:<a href="https://www.fail2ban.org/wiki/index.php/Main_Page">https://www.fail2ban.org/wiki/index.php/Main_Page</a></p>
+]]></content>
+      <categories>
+        <category>Linux</category>
+      </categories>
+      <tags>
+        <tag>服务器</tag>
+        <tag>运维</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>迭代器模式</title>
     <url>/2020/07/25/%E8%BF%AD%E4%BB%A3%E5%99%A8%E6%A8%A1%E5%BC%8F/</url>
     <content><![CDATA[<p>解决问题的“第三者”-迭代器模式</p>
@@ -856,38 +888,6 @@
         <tag>Android</tag>
         <tag>编码规范</tag>
         <tag>设计模式</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>防止SSH暴力破解-fail2ban</title>
-    <url>/2020/02/04/%E9%98%B2%E6%AD%A2SSH%E6%9A%B4%E5%8A%9B%E7%A0%B4%E8%A7%A3-fail2ban/</url>
-    <content><![CDATA[<p>防止SSH被暴力破解</p>
-<a id="more"></a>
-
-<h2 id="系统环境"><a href="#系统环境" class="headerlink" title="系统环境"></a>系统环境</h2><p>操作系统:centOS 7x64</p>
-<h2 id="操作步骤"><a href="#操作步骤" class="headerlink" title="操作步骤"></a>操作步骤</h2><h3 id="安装EPEL源"><a href="#安装EPEL源" class="headerlink" title="安装EPEL源"></a>安装EPEL源</h3><figure class="highlight plain"><figcaption><span>-y install epel-release.noarch ~~~</span></figcaption><table><tr><td class="code"><pre><span class="line">yum -y install epel-release.noarch</span><br></pre></td></tr></table></figure>
-
-<h3 id="安装fail2ban"><a href="#安装fail2ban" class="headerlink" title="安装fail2ban"></a>安装fail2ban</h3><p>centOS 7默认使用了firewalld 作为防火墙,所以这里我们需要安装支持firewalld的fail2ban版本</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">yum -y install fail2ban-firewalld fail2ban-systemd</span><br></pre></td></tr></table></figure>
-
-<h3 id="设置fial2ban"><a href="#设置fial2ban" class="headerlink" title="设置fial2ban"></a>设置fial2ban</h3><p>配置相关文件</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">vi &#x2F;etc&#x2F;fail2ban&#x2F;jail.local</span><br></pre></td></tr></table></figure>
-
-<p>添加以下内容</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[sshd]</span><br><span class="line">#开关</span><br><span class="line">enabled &#x3D; true</span><br><span class="line">#过滤器</span><br><span class="line">filter &#x3D; sshd</span><br><span class="line">#端口号</span><br><span class="line">port &#x3D; 22</span><br><span class="line">#ban时常 30天</span><br><span class="line">bantime  &#x3D; 2592000</span><br><span class="line">#检索时常 5分钟</span><br><span class="line">findtime  &#x3D; 300</span><br><span class="line">#检索时间内错误次数</span><br><span class="line">maxretry &#x3D; 3</span><br></pre></td></tr></table></figure>
-
-<h2 id="常用命令"><a href="#常用命令" class="headerlink" title="常用命令"></a>常用命令</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#启动并设置开机启动</span><br><span class="line">systemctl enable fail2ban</span><br><span class="line">systemctl start fail2ban</span><br><span class="line"></span><br><span class="line">#查看拦截日志</span><br><span class="line">fail2ban-client status sshd</span><br></pre></td></tr></table></figure>
-
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>这里只使用了很小一部分功能,还有其他的配置及命令这里就不写出来了.</p>
-<p>大家有兴趣的话可以去浏览官方文档</p>
-<p>官网地址:<a href="https://www.fail2ban.org/wiki/index.php/Main_Page">https://www.fail2ban.org/wiki/index.php/Main_Page</a></p>
-]]></content>
-      <categories>
-        <category>Linux</category>
-      </categories>
-      <tags>
-        <tag>服务器</tag>
-        <tag>运维</tag>
       </tags>
   </entry>
   <entry>
