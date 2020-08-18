@@ -2,7 +2,7 @@
 <search>
   <entry>
     <title>Android摄像头预览</title>
-    <url>/blog/2019/06/18/Android%E6%91%84%E5%83%8F%E5%A4%B4%E9%A2%84%E8%A7%88/</url>
+    <url>/2019/06/18/Android%E6%91%84%E5%83%8F%E5%A4%B4%E9%A2%84%E8%A7%88/</url>
     <content><![CDATA[<p>本篇主要写的是关于Android6.0 版本的摄像头预览 ,仅预览，没有实现拍照摄像功能</p>
 <a id="more"></a>
 
@@ -62,7 +62,7 @@
   </entry>
   <entry>
     <title>Hexo语法记录</title>
-    <url>/blog/2019/07/15/Hexo%E8%AF%AD%E6%B3%95%E8%AE%B0%E5%BD%95/</url>
+    <url>/2019/07/15/Hexo%E8%AF%AD%E6%B3%95%E8%AE%B0%E5%BD%95/</url>
     <content><![CDATA[<p>平常使用Hexo博客框架时所用到的语法，随时更新</p>
 <a id="more"></a>
 
@@ -81,7 +81,7 @@
   </entry>
   <entry>
     <title>Git 右键菜单添加Git Bash Here</title>
-    <url>/blog/2019/12/21/Git-%E5%8F%B3%E9%94%AE%E8%8F%9C%E5%8D%95%E6%B7%BB%E5%8A%A0Git-Bash-Here/</url>
+    <url>/2019/12/21/Git-%E5%8F%B3%E9%94%AE%E8%8F%9C%E5%8D%95%E6%B7%BB%E5%8A%A0Git-Bash-Here/</url>
     <content><![CDATA[<p>通过修改注册表的方式添加右键菜单  Git Bash Here</p>
 <a id="more"></a>
 
@@ -115,7 +115,7 @@
   </entry>
   <entry>
     <title>K均值-聚类算法</title>
-    <url>/blog/2020/01/05/K%E5%9D%87%E5%80%BC-%E8%81%9A%E7%B1%BB%E7%AE%97%E6%B3%95/</url>
+    <url>/2020/01/05/K%E5%9D%87%E5%80%BC-%E8%81%9A%E7%B1%BB%E7%AE%97%E6%B3%95/</url>
     <content><![CDATA[<p>K均值算法（聚类算法），此处使用的是最简单的一维数组，可用于图像二值化计算。</p>
 <p>由于第一次用，有些地方理解还不深。</p>
 <a id="more"></a>
@@ -163,7 +163,7 @@
   </entry>
   <entry>
     <title>SS搭建+BBR加速</title>
-    <url>/blog/2019/10/30/SS%E6%90%AD%E5%BB%BA-BBR%E5%8A%A0%E9%80%9F/</url>
+    <url>/2019/10/30/SS%E6%90%AD%E5%BB%BA-BBR%E5%8A%A0%E9%80%9F/</url>
     <content><![CDATA[<p>使用VPS服务器搭建ShadowSocks，并使用Google BBR进行加速</p>
 <a id="more"></a>
 
@@ -217,7 +217,7 @@
   </entry>
   <entry>
     <title>博客说明</title>
-    <url>/blog/2019/06/05/%E5%8D%9A%E5%AE%A2%E8%AF%B4%E6%98%8E/</url>
+    <url>/2019/06/05/%E5%8D%9A%E5%AE%A2%E8%AF%B4%E6%98%8E/</url>
     <content><![CDATA[<p>开始工作也一年了，平时也没有做些日志记录，感觉现在什么都不会，比较焦虑。</p>
 <p>所以特意搭建了这个博客，希望以此能激励自己在平时的时候做些技术积累。</p>
 <a id="more"></a>
@@ -233,7 +233,7 @@
   </entry>
   <entry>
     <title>单例模式</title>
-    <url>/blog/2019/09/09/%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/</url>
+    <url>/2019/09/09/%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/</url>
     <content><![CDATA[<p>最常用模式：单例模式</p>
 <a id="more"></a>
 
@@ -285,7 +285,7 @@
   </entry>
   <entry>
     <title>原型模式</title>
-    <url>/blog/2020/03/01/%E5%8E%9F%E5%9E%8B%E6%A8%A1%E5%BC%8F/</url>
+    <url>/2020/03/01/%E5%8E%9F%E5%9E%8B%E6%A8%A1%E5%BC%8F/</url>
     <content><![CDATA[<p>使程序运行更高效-原型模式</p>
 <p>原型模式多用于创建复杂的或者构造耗时的实例，因为这种情况下，复制一个已经存在的实例可使程序运行更高效。</p>
 <a id="more"></a>
@@ -326,7 +326,7 @@
   </entry>
   <entry>
     <title>命令模式</title>
-    <url>/blog/2020/05/21/%E5%91%BD%E4%BB%A4%E6%A8%A1%E5%BC%8F/</url>
+    <url>/2020/05/21/%E5%91%BD%E4%BB%A4%E6%A8%A1%E5%BC%8F/</url>
     <content><![CDATA[<p>让程序通畅运行-命令模式</p>
 <a id="more"></a>
 
@@ -369,7 +369,7 @@
   </entry>
   <entry>
     <title>备忘录模式</title>
-    <url>/blog/2020/07/25/%E5%A4%87%E5%BF%98%E5%BD%95%E6%A8%A1%E5%BC%8F/</url>
+    <url>/2020/07/25/%E5%A4%87%E5%BF%98%E5%BD%95%E6%A8%A1%E5%BC%8F/</url>
     <content><![CDATA[<p>编程中的‘后悔药’-备忘录模式</p>
 <a id="more"></a>
 
@@ -412,7 +412,7 @@
   </entry>
   <entry>
     <title>工厂模式</title>
-    <url>/blog/2020/03/07/%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F/</url>
+    <url>/2020/03/07/%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F/</url>
     <content><![CDATA[<p>应用最广泛的模式-工厂方法模式</p>
 <a id="more"></a>
 
@@ -437,7 +437,7 @@
   </entry>
   <entry>
     <title>抽象工厂模式</title>
-    <url>/blog/2020/03/22/%E6%8A%BD%E8%B1%A1%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F/</url>
+    <url>/2020/03/22/%E6%8A%BD%E8%B1%A1%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F/</url>
     <content><![CDATA[<p>创建型设计模式-抽象工厂方法模式</p>
 <a id="more"></a>
 
@@ -489,7 +489,7 @@
   </entry>
   <entry>
     <title>建造者模式</title>
-    <url>/blog/2019/12/28/%E5%BB%BA%E9%80%A0%E8%80%85%E6%A8%A1%E5%BC%8F/</url>
+    <url>/2019/12/28/%E5%BB%BA%E9%80%A0%E8%80%85%E6%A8%A1%E5%BC%8F/</url>
     <content><![CDATA[<p>自由拓展你的项目：建造者模式(Builder模式)</p>
 <a id="more"></a>
 
@@ -507,7 +507,7 @@
   </entry>
   <entry>
     <title>模板方法模式</title>
-    <url>/blog/2020/07/25/%E6%A8%A1%E6%9D%BF%E6%96%B9%E6%B3%95%E6%A8%A1%E5%BC%8F/</url>
+    <url>/2020/07/25/%E6%A8%A1%E6%9D%BF%E6%96%B9%E6%B3%95%E6%A8%A1%E5%BC%8F/</url>
     <content><![CDATA[<p>抓住问题的核心-模板方法模式</p>
 <a id="more"></a>
 
@@ -559,7 +559,7 @@
   </entry>
   <entry>
     <title>观察者模式</title>
-    <url>/blog/2020/07/04/%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8F/</url>
+    <url>/2020/07/04/%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8F/</url>
     <content><![CDATA[<p>解决、解耦的钥匙-观察者模式</p>
 <a id="more"></a>
 
@@ -600,7 +600,7 @@
   </entry>
   <entry>
     <title>策略模式</title>
-    <url>/blog/2020/03/22/%E7%AD%96%E7%95%A5%E6%A8%A1%E5%BC%8F/</url>
+    <url>/2020/03/22/%E7%AD%96%E7%95%A5%E6%A8%A1%E5%BC%8F/</url>
     <content><![CDATA[<p>时势造英雄-策略模式</p>
 <a id="more"></a>
 
@@ -650,7 +650,7 @@
   </entry>
   <entry>
     <title>解释器模式</title>
-    <url>/blog/2020/06/29/%E8%A7%A3%E9%87%8A%E5%99%A8%E6%A8%A1%E5%BC%8F/</url>
+    <url>/2020/06/29/%E8%A7%A3%E9%87%8A%E5%99%A8%E6%A8%A1%E5%BC%8F/</url>
     <content><![CDATA[<p>化简为繁的翻译机-解释器模式</p>
 <a id="more"></a>
 
@@ -695,7 +695,7 @@
   </entry>
   <entry>
     <title>责任链模式</title>
-    <url>/blog/2020/05/05/%E8%B4%A3%E4%BB%BB%E9%93%BE%E6%A8%A1%E5%BC%8F/</url>
+    <url>/2020/05/05/%E8%B4%A3%E4%BB%BB%E9%93%BE%E6%A8%A1%E5%BC%8F/</url>
     <content><![CDATA[<p>使编程更有灵活性-责任链模式</p>
 <a id="more"></a>
 
@@ -739,7 +739,7 @@
   </entry>
   <entry>
     <title>防止SSH暴力破解-fail2ban</title>
-    <url>/blog/2020/02/04/%E9%98%B2%E6%AD%A2SSH%E6%9A%B4%E5%8A%9B%E7%A0%B4%E8%A7%A3-fail2ban/</url>
+    <url>/2020/02/04/%E9%98%B2%E6%AD%A2SSH%E6%9A%B4%E5%8A%9B%E7%A0%B4%E8%A7%A3-fail2ban/</url>
     <content><![CDATA[<p>防止SSH被暴力破解</p>
 <a id="more"></a>
 
@@ -771,7 +771,7 @@
   </entry>
   <entry>
     <title>迭代器模式</title>
-    <url>/blog/2020/07/25/%E8%BF%AD%E4%BB%A3%E5%99%A8%E6%A8%A1%E5%BC%8F/</url>
+    <url>/2020/07/25/%E8%BF%AD%E4%BB%A3%E5%99%A8%E6%A8%A1%E5%BC%8F/</url>
     <content><![CDATA[<p>解决问题的“第三者”-迭代器模式</p>
 <a id="more"></a>
 
@@ -815,7 +815,7 @@
   </entry>
   <entry>
     <title>面对对象6大原则</title>
-    <url>/blog/2019/08/27/%E9%9D%A2%E5%AF%B9%E5%AF%B9%E8%B1%A16%E5%A4%A7%E5%8E%9F%E5%88%99/</url>
+    <url>/2019/08/27/%E9%9D%A2%E5%AF%B9%E5%AF%B9%E8%B1%A16%E5%A4%A7%E5%8E%9F%E5%88%99/</url>
     <content><![CDATA[<p>面对对象编程时的代码规范和标准，之后有想到的还会有补充</p>
 <a id="more"></a>
 
@@ -868,7 +868,7 @@
   </entry>
   <entry>
     <title>hexo配置及安装-Mac</title>
-    <url>/blog/2020/08/17/hexo%E9%85%8D%E7%BD%AE%E5%8F%8A%E5%AE%89%E8%A3%85-Mac/</url>
+    <url>/2020/08/17/hexo%E9%85%8D%E7%BD%AE%E5%8F%8A%E5%AE%89%E8%A3%85-Mac/</url>
     <content><![CDATA[<p>最近新换了电脑，要把hexo博客搬运到新电脑中，特此记录下</p>
 <a id="more"></a>
 
@@ -927,7 +927,7 @@
   </entry>
   <entry>
     <title>状态模式</title>
-    <url>/blog/2020/04/19/%E7%8A%B6%E6%80%81%E6%A8%A1%E5%BC%8F/</url>
+    <url>/2020/04/19/%E7%8A%B6%E6%80%81%E6%A8%A1%E5%BC%8F/</url>
     <content><![CDATA[<p>随遇而安-状态模式</p>
 <a id="more"></a>
 
@@ -976,7 +976,7 @@
   </entry>
   <entry>
     <title>Builder模式</title>
-    <url>/blog/2020/03/01/Builder%E6%A8%A1%E5%BC%8F/</url>
+    <url>/2020/03/01/Builder%E6%A8%A1%E5%BC%8F/</url>
     <content><![CDATA[<p>自由拓展你的程序-建造者模式（Builder模式）</p>
 <p>一个复杂对象的构建与它的表示分离。使得同样的构建过程可以创建不同的表示。</p>
 <a id="more"></a>
@@ -1004,7 +1004,7 @@
   </entry>
   <entry>
     <title>hexo博客更新脚本-mac</title>
-    <url>/blog/2020/08/18/hexo%E5%8D%9A%E5%AE%A2%E6%9B%B4%E6%96%B0%E8%84%9A%E6%9C%AC-mac/</url>
+    <url>/2020/08/18/hexo%E5%8D%9A%E5%AE%A2%E6%9B%B4%E6%96%B0%E8%84%9A%E6%9C%AC-mac/</url>
     <content><![CDATA[<p>昨天将博客搬到新电脑了，今天搞了个更新脚本，基本算是自动化吧，特此记录下</p>
 <a id="more"></a>
 
