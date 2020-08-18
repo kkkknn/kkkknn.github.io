@@ -2,7 +2,7 @@
 <search>
   <entry>
     <title>Android摄像头预览</title>
-    <url>/2019/06/18/Android%E6%91%84%E5%83%8F%E5%A4%B4%E9%A2%84%E8%A7%88/</url>
+    <url>/blog/2019/06/18/Android%E6%91%84%E5%83%8F%E5%A4%B4%E9%A2%84%E8%A7%88/</url>
     <content><![CDATA[<p>本篇主要写的是关于Android6.0 版本的摄像头预览 ,仅预览，没有实现拍照摄像功能</p>
 <a id="more"></a>
 
@@ -61,36 +61,8 @@
       </tags>
   </entry>
   <entry>
-    <title>Builder模式</title>
-    <url>/2020/03/01/Builderg%CC%A7%CA%BD/</url>
-    <content><![CDATA[<p>自由拓展你的程序-建造者模式（Builder模式）</p>
-<p>一个复杂对象的构建与它的表示分离。使得同样的构建过程可以创建不同的表示。</p>
-<a id="more"></a>
-
-<h3 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h3><ol>
-<li>相同的方法，不同的执行顺序，产生不同的结果时。</li>
-<li>多个零件或者部件，都可以装配到一个对象中，但是产生的运行结果又不想同时。</li>
-<li>产品类非常复杂，或者产品类中的调用顺序不同产生了不同的作用，这个时候使用建造者模式就非常合适。</li>
-<li>当初始化一个对象特别复杂，例如参数多，且很多参数都有默认值时</li>
-</ol>
-<h3 id="简单实现"><a href="#简单实现" class="headerlink" title="简单实现"></a>简单实现</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//抽象类</span></span><br><span class="line"><span class="keyword">package</span> Builder;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">Computer</span> </span>&#123;</span><br><span class="line">    <span class="keyword">protected</span> String mBoard;</span><br><span class="line">    <span class="keyword">protected</span> String mDisplay;</span><br><span class="line">    <span class="keyword">protected</span> String mOS;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="title">Computer</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setBoard</span><span class="params">(String board)</span></span>&#123;</span><br><span class="line">        mBoard=board;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//设置内存</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setDisplay</span><span class="params">(String display)</span></span>&#123;</span><br><span class="line">        mDisplay=display;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//设置操作系统</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">setOS</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;Computer&#123;&quot;</span> +</span><br><span class="line">                <span class="string">&quot;mBoard=&#x27;&quot;</span> + mBoard + <span class="string">&#x27;\&#x27;&#x27;</span> +</span><br><span class="line">                <span class="string">&quot;, mDisplay=&#x27;&quot;</span> + mDisplay + <span class="string">&#x27;\&#x27;&#x27;</span> +</span><br><span class="line">                <span class="string">&quot;, mOS=&#x27;&quot;</span> + mOS + <span class="string">&#x27;\&#x27;&#x27;</span> +</span><br><span class="line">                <span class="string">&#x27;&#125;&#x27;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//Builder类</span></span><br><span class="line"><span class="keyword">package</span> Builder;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">Builder</span> </span>&#123;</span><br><span class="line">    <span class="comment">//设置主机</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">buildBoard</span><span class="params">(String board)</span></span>;</span><br><span class="line">    <span class="comment">//设置显示器</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">buildDisplay</span><span class="params">(String display)</span></span>;</span><br><span class="line">    <span class="comment">//设置操作系统</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">buildOS</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="comment">//创建computer</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> Computer <span class="title">create</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">package</span> Builder;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Director</span> </span>&#123;</span><br><span class="line">    Builder mBuilder=<span class="keyword">null</span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Director</span><span class="params">(Builder builder)</span></span>&#123;</span><br><span class="line">        mBuilder=builder;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">construct</span><span class="params">(String board,String display)</span></span>&#123;</span><br><span class="line">        mBuilder.buildBoard(board);</span><br><span class="line">        mBuilder.buildDisplay(display);</span><br><span class="line">        mBuilder.buildOS();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">package</span> Builder;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Macbook</span> <span class="keyword">extends</span> <span class="title">Computer</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Macbook</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setOS</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        mOS=<span class="string">&quot;MAC OS X 10.10&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">package</span> Builder;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MacbookBuilder</span> <span class="keyword">extends</span> <span class="title">Builder</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> Computer mComputer=<span class="keyword">new</span> Macbook();</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">buildBoard</span><span class="params">(String board)</span> </span>&#123;</span><br><span class="line">        mComputer.setBoard(board);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">buildDisplay</span><span class="params">(String display)</span> </span>&#123;</span><br><span class="line">        mComputer.setDisplay(display);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">buildOS</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        mComputer.setOS();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Computer <span class="title">create</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> mComputer;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//测试类</span></span><br><span class="line"><span class="keyword">package</span> Builder;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Builder builder=<span class="keyword">new</span> MacbookBuilder();</span><br><span class="line">        Director pcDirector=<span class="keyword">new</span> Director(builder);</span><br><span class="line">        pcDirector.construct(<span class="string">&quot;因特尔主板&quot;</span>,<span class="string">&quot;测试显示器&quot;</span>);</span><br><span class="line">        System.out.println(<span class="string">&quot;computer info :&quot;</span>+builder.create().toString());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p><strong>执行结果：</strong></p>
-<img src="/2020/03/01/Builderg%CC%A7%CA%BD/show.png" class="" title="执行结果">
-
-]]></content>
-      <categories>
-        <category>Android</category>
-      </categories>
-      <tags>
-        <tag>Android</tag>
-        <tag>编码规范</tag>
-        <tag>设计模式</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Hexo语法记录</title>
-    <url>/2019/07/15/Hexo%E8%AF%AD%E6%B3%95%E8%AE%B0%E5%BD%95/</url>
+    <url>/blog/2019/07/15/Hexo%E8%AF%AD%E6%B3%95%E8%AE%B0%E5%BD%95/</url>
     <content><![CDATA[<p>平常使用Hexo博客框架时所用到的语法，随时更新</p>
 <a id="more"></a>
 
@@ -109,7 +81,7 @@
   </entry>
   <entry>
     <title>Git 右键菜单添加Git Bash Here</title>
-    <url>/2019/12/21/Git-%E5%8F%B3%E9%94%AE%E8%8F%9C%E5%8D%95%E6%B7%BB%E5%8A%A0Git-Bash-Here/</url>
+    <url>/blog/2019/12/21/Git-%E5%8F%B3%E9%94%AE%E8%8F%9C%E5%8D%95%E6%B7%BB%E5%8A%A0Git-Bash-Here/</url>
     <content><![CDATA[<p>通过修改注册表的方式添加右键菜单  Git Bash Here</p>
 <a id="more"></a>
 
@@ -143,7 +115,7 @@
   </entry>
   <entry>
     <title>K均值-聚类算法</title>
-    <url>/2020/01/05/K%E5%9D%87%E5%80%BC-%E8%81%9A%E7%B1%BB%E7%AE%97%E6%B3%95/</url>
+    <url>/blog/2020/01/05/K%E5%9D%87%E5%80%BC-%E8%81%9A%E7%B1%BB%E7%AE%97%E6%B3%95/</url>
     <content><![CDATA[<p>K均值算法（聚类算法），此处使用的是最简单的一维数组，可用于图像二值化计算。</p>
 <p>由于第一次用，有些地方理解还不深。</p>
 <a id="more"></a>
@@ -191,7 +163,7 @@
   </entry>
   <entry>
     <title>SS搭建+BBR加速</title>
-    <url>/2019/10/30/SS%E6%90%AD%E5%BB%BA-BBR%E5%8A%A0%E9%80%9F/</url>
+    <url>/blog/2019/10/30/SS%E6%90%AD%E5%BB%BA-BBR%E5%8A%A0%E9%80%9F/</url>
     <content><![CDATA[<p>使用VPS服务器搭建ShadowSocks，并使用Google BBR进行加速</p>
 <a id="more"></a>
 
@@ -244,57 +216,8 @@
       </tags>
   </entry>
   <entry>
-    <title>状态模式</title>
-    <url>/2020/04/19/%D7%B4%CC%ACg%CC%A7%CA%BD/</url>
-    <content><![CDATA[<p>随遇而安-状态模式</p>
-<a id="more"></a>
-
-<h2 id="模式简介"><a href="#模式简介" class="headerlink" title="模式简介"></a>模式简介</h2><p>当一个对象内在状态改变时允许改变其行为，这个对象看起来像是改变了其类</p>
-<h2 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h2><ul>
-<li>一个对象的行为取决于它的状态，并且它必须在运行时根据状态改变它的行为</li>
-<li>代码中包含大量与对象状态有关的条件语句，例如：一个操作中含有庞大的多分支语句（if-else   switch-case），且这些分支依赖于该对象的状态</li>
-</ul>
-<p>状态模式将每一个条件分支放入一个独立的类中，这使得你可以根据对象自身的情况将对象的状态作为一个对象，这个对象可以不依赖与其他对象而独立变化，这样通过多态来去除过多的重复的if-else等分支语句。</p>
-<h2 id="简单实现"><a href="#简单实现" class="headerlink" title="简单实现"></a>简单实现</h2><p>以电视遥控器为例子</p>
-<p><strong>电视状态接口</strong></p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">public interface TvState &#123;</span><br><span class="line">    public void nextChannel();</span><br><span class="line">    public void prevChannel();</span><br><span class="line">    public void turnUp();</span><br><span class="line">    public void turnDown();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>关机状态</strong></p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">public class PowerOffState implements TvState &#123;</span><br><span class="line">    public void nextChannel() &#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void prevChannel() &#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void turnUp() &#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void turnDown() &#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>开机状态</strong></p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">public class PowerOnState implements TvState &#123;</span><br><span class="line">    public void nextChannel() &#123;</span><br><span class="line">        System.out.println(&quot;下一频道&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void prevChannel() &#123;</span><br><span class="line"></span><br><span class="line">        System.out.println(&quot;上一频道&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void turnUp() &#123;</span><br><span class="line"></span><br><span class="line">        System.out.println(&quot;提高音量&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void turnDown() &#123;</span><br><span class="line"></span><br><span class="line">        System.out.println(&quot;降低音量&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>电源操作接口</strong></p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">public interface PowerController &#123;</span><br><span class="line">    public void powerOn();</span><br><span class="line">    public void powerOff();</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p><strong>电视遥控器</strong></p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">public class TvController implements PowerController &#123;</span><br><span class="line">    private TvState tvState;</span><br><span class="line">    public void setTvState(TvState tvState)&#123;</span><br><span class="line">        this.tvState&#x3D;tvState;</span><br><span class="line">    &#125;</span><br><span class="line">    public void powerOn() &#123;</span><br><span class="line">        setTvState(new PowerOnState());</span><br><span class="line">        System.out.println(&quot;开机了&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void powerOff() &#123;</span><br><span class="line">        setTvState(new PowerOffState());</span><br><span class="line">        System.out.println(&quot;关机了&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">    public void nextChannel()&#123;</span><br><span class="line">        tvState.nextChannel();</span><br><span class="line">    &#125;</span><br><span class="line">    public void prevChannel()&#123;</span><br><span class="line">        tvState.prevChannel();</span><br><span class="line">    &#125;</span><br><span class="line">    public void turnUp()&#123;</span><br><span class="line">        tvState.turnUp();</span><br><span class="line">    &#125;</span><br><span class="line">    public void turnDown()&#123;</span><br><span class="line">        tvState.turnDown();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>客户端调用</strong></p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">public class Client &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        TvController tvController&#x3D;new TvController();</span><br><span class="line">        tvController.powerOn();</span><br><span class="line">        tvController.nextChannel();</span><br><span class="line">        tvController.prevChannel();</span><br><span class="line">        tvController.turnUp();</span><br><span class="line">        tvController.powerOff();</span><br><span class="line">        tvController.turnUp();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>执行结果</strong></p>
-<img src="/2020/04/19/%D7%B4%CC%ACg%CC%A7%CA%BD/stateMode.png" class="" title="执行结果">
-
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>  不同状态下对于同一行为有不同的相应，这其实就是一个将if-else用多态来实现的一个具体示例</p>
-<p><strong>优点</strong></p>
-<p>​    模式将所有与一个特定状态相关的行为都放入在一个状态对象中，它提供了一个更好的方法来组织与特定状态相关的代码，将繁琐的状态判断转换成结构清晰的状态类簇，在避免代码膨胀的同时也保证了可扩展性与可维护性</p>
-<p><strong>缺点</strong></p>
-<p>​    模式的使用必然会增加系统类和对象的个数</p>
-]]></content>
-      <categories>
-        <category>Android</category>
-      </categories>
-      <tags>
-        <tag>Android</tag>
-        <tag>编码规范</tag>
-        <tag>设计模式</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>博客说明</title>
-    <url>/2019/06/05/%E5%8D%9A%E5%AE%A2%E8%AF%B4%E6%98%8E/</url>
+    <url>/blog/2019/06/05/%E5%8D%9A%E5%AE%A2%E8%AF%B4%E6%98%8E/</url>
     <content><![CDATA[<p>开始工作也一年了，平时也没有做些日志记录，感觉现在什么都不会，比较焦虑。</p>
 <p>所以特意搭建了这个博客，希望以此能激励自己在平时的时候做些技术积累。</p>
 <a id="more"></a>
@@ -310,7 +233,7 @@
   </entry>
   <entry>
     <title>单例模式</title>
-    <url>/2019/09/09/%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/</url>
+    <url>/blog/2019/09/09/%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/</url>
     <content><![CDATA[<p>最常用模式：单例模式</p>
 <a id="more"></a>
 
@@ -362,7 +285,7 @@
   </entry>
   <entry>
     <title>原型模式</title>
-    <url>/2020/03/01/%E5%8E%9F%E5%9E%8B%E6%A8%A1%E5%BC%8F/</url>
+    <url>/blog/2020/03/01/%E5%8E%9F%E5%9E%8B%E6%A8%A1%E5%BC%8F/</url>
     <content><![CDATA[<p>使程序运行更高效-原型模式</p>
 <p>原型模式多用于创建复杂的或者构造耗时的实例，因为这种情况下，复制一个已经存在的实例可使程序运行更高效。</p>
 <a id="more"></a>
@@ -403,7 +326,7 @@
   </entry>
   <entry>
     <title>命令模式</title>
-    <url>/2020/05/21/%E5%91%BD%E4%BB%A4%E6%A8%A1%E5%BC%8F/</url>
+    <url>/blog/2020/05/21/%E5%91%BD%E4%BB%A4%E6%A8%A1%E5%BC%8F/</url>
     <content><![CDATA[<p>让程序通畅运行-命令模式</p>
 <a id="more"></a>
 
@@ -446,7 +369,7 @@
   </entry>
   <entry>
     <title>备忘录模式</title>
-    <url>/2020/07/25/%E5%A4%87%E5%BF%98%E5%BD%95%E6%A8%A1%E5%BC%8F/</url>
+    <url>/blog/2020/07/25/%E5%A4%87%E5%BF%98%E5%BD%95%E6%A8%A1%E5%BC%8F/</url>
     <content><![CDATA[<p>编程中的‘后悔药’-备忘录模式</p>
 <a id="more"></a>
 
@@ -489,7 +412,7 @@
   </entry>
   <entry>
     <title>工厂模式</title>
-    <url>/2020/03/07/%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F/</url>
+    <url>/blog/2020/03/07/%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F/</url>
     <content><![CDATA[<p>应用最广泛的模式-工厂方法模式</p>
 <a id="more"></a>
 
@@ -514,7 +437,7 @@
   </entry>
   <entry>
     <title>抽象工厂模式</title>
-    <url>/2020/03/22/%E6%8A%BD%E8%B1%A1%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F/</url>
+    <url>/blog/2020/03/22/%E6%8A%BD%E8%B1%A1%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F/</url>
     <content><![CDATA[<p>创建型设计模式-抽象工厂方法模式</p>
 <a id="more"></a>
 
@@ -566,7 +489,7 @@
   </entry>
   <entry>
     <title>建造者模式</title>
-    <url>/2019/12/28/%E5%BB%BA%E9%80%A0%E8%80%85%E6%A8%A1%E5%BC%8F/</url>
+    <url>/blog/2019/12/28/%E5%BB%BA%E9%80%A0%E8%80%85%E6%A8%A1%E5%BC%8F/</url>
     <content><![CDATA[<p>自由拓展你的项目：建造者模式(Builder模式)</p>
 <a id="more"></a>
 
@@ -584,7 +507,7 @@
   </entry>
   <entry>
     <title>模板方法模式</title>
-    <url>/2020/07/25/%E6%A8%A1%E6%9D%BF%E6%96%B9%E6%B3%95%E6%A8%A1%E5%BC%8F/</url>
+    <url>/blog/2020/07/25/%E6%A8%A1%E6%9D%BF%E6%96%B9%E6%B3%95%E6%A8%A1%E5%BC%8F/</url>
     <content><![CDATA[<p>抓住问题的核心-模板方法模式</p>
 <a id="more"></a>
 
@@ -636,7 +559,7 @@
   </entry>
   <entry>
     <title>观察者模式</title>
-    <url>/2020/07/04/%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8F/</url>
+    <url>/blog/2020/07/04/%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8F/</url>
     <content><![CDATA[<p>解决、解耦的钥匙-观察者模式</p>
 <a id="more"></a>
 
@@ -677,7 +600,7 @@
   </entry>
   <entry>
     <title>策略模式</title>
-    <url>/2020/03/22/%E7%AD%96%E7%95%A5%E6%A8%A1%E5%BC%8F/</url>
+    <url>/blog/2020/03/22/%E7%AD%96%E7%95%A5%E6%A8%A1%E5%BC%8F/</url>
     <content><![CDATA[<p>时势造英雄-策略模式</p>
 <a id="more"></a>
 
@@ -727,7 +650,7 @@
   </entry>
   <entry>
     <title>解释器模式</title>
-    <url>/2020/06/29/%E8%A7%A3%E9%87%8A%E5%99%A8%E6%A8%A1%E5%BC%8F/</url>
+    <url>/blog/2020/06/29/%E8%A7%A3%E9%87%8A%E5%99%A8%E6%A8%A1%E5%BC%8F/</url>
     <content><![CDATA[<p>化简为繁的翻译机-解释器模式</p>
 <a id="more"></a>
 
@@ -772,7 +695,7 @@
   </entry>
   <entry>
     <title>责任链模式</title>
-    <url>/2020/05/05/%E8%B4%A3%E4%BB%BB%E9%93%BE%E6%A8%A1%E5%BC%8F/</url>
+    <url>/blog/2020/05/05/%E8%B4%A3%E4%BB%BB%E9%93%BE%E6%A8%A1%E5%BC%8F/</url>
     <content><![CDATA[<p>使编程更有灵活性-责任链模式</p>
 <a id="more"></a>
 
@@ -816,7 +739,7 @@
   </entry>
   <entry>
     <title>防止SSH暴力破解-fail2ban</title>
-    <url>/2020/02/04/%E9%98%B2%E6%AD%A2SSH%E6%9A%B4%E5%8A%9B%E7%A0%B4%E8%A7%A3-fail2ban/</url>
+    <url>/blog/2020/02/04/%E9%98%B2%E6%AD%A2SSH%E6%9A%B4%E5%8A%9B%E7%A0%B4%E8%A7%A3-fail2ban/</url>
     <content><![CDATA[<p>防止SSH被暴力破解</p>
 <a id="more"></a>
 
@@ -848,7 +771,7 @@
   </entry>
   <entry>
     <title>迭代器模式</title>
-    <url>/2020/07/25/%E8%BF%AD%E4%BB%A3%E5%99%A8%E6%A8%A1%E5%BC%8F/</url>
+    <url>/blog/2020/07/25/%E8%BF%AD%E4%BB%A3%E5%99%A8%E6%A8%A1%E5%BC%8F/</url>
     <content><![CDATA[<p>解决问题的“第三者”-迭代器模式</p>
 <a id="more"></a>
 
@@ -892,7 +815,7 @@
   </entry>
   <entry>
     <title>面对对象6大原则</title>
-    <url>/2019/08/27/%E9%9D%A2%E5%AF%B9%E5%AF%B9%E8%B1%A16%E5%A4%A7%E5%8E%9F%E5%88%99/</url>
+    <url>/blog/2019/08/27/%E9%9D%A2%E5%AF%B9%E5%AF%B9%E8%B1%A16%E5%A4%A7%E5%8E%9F%E5%88%99/</url>
     <content><![CDATA[<p>面对对象编程时的代码规范和标准，之后有想到的还会有补充</p>
 <a id="more"></a>
 
@@ -941,6 +864,202 @@
       <tags>
         <tag>Android</tag>
         <tag>编码规范</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>hexo配置及安装-Mac</title>
+    <url>/blog/2020/08/17/hexo%E9%85%8D%E7%BD%AE%E5%8F%8A%E5%AE%89%E8%A3%85-Mac/</url>
+    <content><![CDATA[<p>最近新换了电脑，要把hexo博客搬运到新电脑中，特此记录下</p>
+<a id="more"></a>
+
+<p>Hero 官网：<a href="https://hexo.io/">https://hexo.io/</a></p>
+<p>next 主题：<a href="https://github.com/theme-next/hexo-theme-next">https://github.com/theme-next/hexo-theme-next</a></p>
+<h2 id="准备环境"><a href="#准备环境" class="headerlink" title="准备环境"></a>准备环境</h2><p><strong>系统：</strong> macOS</p>
+<p><strong>已安装环境：</strong></p>
+<p>​    node 12.18.3</p>
+<p>​    git  2.24.3</p>
+<h3 id="安装步骤"><a href="#安装步骤" class="headerlink" title="安装步骤"></a>安装步骤</h3><ol>
+<li><p>设置淘宝镜像源(直接安装hexo会很慢，所以这里我们替换下源)</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">sudo npm install -g cnpm --registry&#x3D;https:&#x2F;&#x2F;registry.npm.taobao.org --verbose</span><br></pre></td></tr></table></figure>
+
+<p>此时会提示输入用户开机密码，输入即可</p>
+<p>最后看到下面提示信息即为安装成功</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">added 692 packages in 29.865s</span><br><span class="line">npm verb exit [ 0, true ]</span><br><span class="line">npm info ok</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>安装hexo（这里我不熟悉npm命令，所以就直接采用官网方式一键安装了）</p>
+<p>安装命令：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">sudo npm install hexo-cli -g </span><br></pre></td></tr></table></figure>
+
+<p>卸载命令：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">sudo npm uninstall hexo-cli -g </span><br></pre></td></tr></table></figure>
+</li>
+<li><p>开启本地服务进行预览</p>
+<p>执行 hero s 命令后访问 <a href="http://localhost:4000/">http://localhost:4000/</a> 即可看到效果</p>
+</li>
+<li><p>设置主题</p>
+<p>这里看个人喜好了，我这里就用next主题了</p>
+<ol>
+<li><p>下载主题</p>
+<p>进入到hexo 目录执行下面命令clone主题(GitHub 速度感人，这里要多等会)</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">git clone https:&#x2F;&#x2F;github.com&#x2F;theme-next&#x2F;hexo-theme-next themes&#x2F;next</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>更新主题</p>
+<p>以后时间长了要更新主题的话就执行下面命令进行更新(其实就是git 重新拉取下项目)</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">cd thems&#x2F;next</span><br><span class="line">git pull</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>配置主题</p>
+<p>这里就是简单配置下主题</p>
+<p>参照的<a href="https://www.jianshu.com/p/3a05351a37dc">https://www.jianshu.com/p/3a05351a37dc</a> 进行的简单配置</p>
+</li>
+</ol>
+</li>
+<li><p>推送到GitHub Page</p>
+<p>修改hexo中_copnfig.yml文件中以下部分</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># Deployment</span><br><span class="line">## Docs: https:&#x2F;&#x2F;hexo.io&#x2F;docs&#x2F;one-command-deployment</span><br><span class="line">deploy:</span><br><span class="line">  type: &#39;git&#39;</span><br><span class="line">  repository: git@github.com:kkkknn&#x2F;kkkknn.github.io.git</span><br><span class="line">  branch: master</span><br></pre></td></tr></table></figure></li>
+</ol>
+]]></content>
+      <categories>
+        <category>博客相关</category>
+      </categories>
+      <tags>
+        <tag>博客</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>状态模式</title>
+    <url>/blog/2020/04/19/%E7%8A%B6%E6%80%81%E6%A8%A1%E5%BC%8F/</url>
+    <content><![CDATA[<p>随遇而安-状态模式</p>
+<a id="more"></a>
+
+<h2 id="模式简介"><a href="#模式简介" class="headerlink" title="模式简介"></a>模式简介</h2><p>当一个对象内在状态改变时允许改变其行为，这个对象看起来像是改变了其类</p>
+<h2 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h2><ul>
+<li>一个对象的行为取决于它的状态，并且它必须在运行时根据状态改变它的行为</li>
+<li>代码中包含大量与对象状态有关的条件语句，例如：一个操作中含有庞大的多分支语句（if-else   switch-case），且这些分支依赖于该对象的状态</li>
+</ul>
+<p>状态模式将每一个条件分支放入一个独立的类中，这使得你可以根据对象自身的情况将对象的状态作为一个对象，这个对象可以不依赖与其他对象而独立变化，这样通过多态来去除过多的重复的if-else等分支语句。</p>
+<h2 id="简单实现"><a href="#简单实现" class="headerlink" title="简单实现"></a>简单实现</h2><p>以电视遥控器为例子</p>
+<p><strong>电视状态接口</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">public interface TvState &#123;</span><br><span class="line">    public void nextChannel();</span><br><span class="line">    public void prevChannel();</span><br><span class="line">    public void turnUp();</span><br><span class="line">    public void turnDown();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>关机状态</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">public class PowerOffState implements TvState &#123;</span><br><span class="line">    public void nextChannel() &#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void prevChannel() &#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void turnUp() &#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void turnDown() &#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>开机状态</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">public class PowerOnState implements TvState &#123;</span><br><span class="line">    public void nextChannel() &#123;</span><br><span class="line">        System.out.println(&quot;下一频道&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void prevChannel() &#123;</span><br><span class="line"></span><br><span class="line">        System.out.println(&quot;上一频道&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void turnUp() &#123;</span><br><span class="line"></span><br><span class="line">        System.out.println(&quot;提高音量&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void turnDown() &#123;</span><br><span class="line"></span><br><span class="line">        System.out.println(&quot;降低音量&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>电源操作接口</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">public interface PowerController &#123;</span><br><span class="line">    public void powerOn();</span><br><span class="line">    public void powerOff();</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>电视遥控器</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">public class TvController implements PowerController &#123;</span><br><span class="line">    private TvState tvState;</span><br><span class="line">    public void setTvState(TvState tvState)&#123;</span><br><span class="line">        this.tvState&#x3D;tvState;</span><br><span class="line">    &#125;</span><br><span class="line">    public void powerOn() &#123;</span><br><span class="line">        setTvState(new PowerOnState());</span><br><span class="line">        System.out.println(&quot;开机了&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void powerOff() &#123;</span><br><span class="line">        setTvState(new PowerOffState());</span><br><span class="line">        System.out.println(&quot;关机了&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">    public void nextChannel()&#123;</span><br><span class="line">        tvState.nextChannel();</span><br><span class="line">    &#125;</span><br><span class="line">    public void prevChannel()&#123;</span><br><span class="line">        tvState.prevChannel();</span><br><span class="line">    &#125;</span><br><span class="line">    public void turnUp()&#123;</span><br><span class="line">        tvState.turnUp();</span><br><span class="line">    &#125;</span><br><span class="line">    public void turnDown()&#123;</span><br><span class="line">        tvState.turnDown();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>客户端调用</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">public class Client &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        TvController tvController&#x3D;new TvController();</span><br><span class="line">        tvController.powerOn();</span><br><span class="line">        tvController.nextChannel();</span><br><span class="line">        tvController.prevChannel();</span><br><span class="line">        tvController.turnUp();</span><br><span class="line">        tvController.powerOff();</span><br><span class="line">        tvController.turnUp();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>执行结果</strong></p>
+<img src="/blog/2020/04/19/%E7%8A%B6%E6%80%81%E6%A8%A1%E5%BC%8F/stateMode.png" class="" title="执行结果">
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>  不同状态下对于同一行为有不同的相应，这其实就是一个将if-else用多态来实现的一个具体示例</p>
+<p><strong>优点</strong></p>
+<p>​    模式将所有与一个特定状态相关的行为都放入在一个状态对象中，它提供了一个更好的方法来组织与特定状态相关的代码，将繁琐的状态判断转换成结构清晰的状态类簇，在避免代码膨胀的同时也保证了可扩展性与可维护性</p>
+<p><strong>缺点</strong></p>
+<p>​    模式的使用必然会增加系统类和对象的个数</p>
+]]></content>
+      <categories>
+        <category>Android</category>
+      </categories>
+      <tags>
+        <tag>Android</tag>
+        <tag>编码规范</tag>
+        <tag>设计模式</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Builder模式</title>
+    <url>/blog/2020/03/01/Builder%E6%A8%A1%E5%BC%8F/</url>
+    <content><![CDATA[<p>自由拓展你的程序-建造者模式（Builder模式）</p>
+<p>一个复杂对象的构建与它的表示分离。使得同样的构建过程可以创建不同的表示。</p>
+<a id="more"></a>
+
+<h3 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h3><ol>
+<li>相同的方法，不同的执行顺序，产生不同的结果时。</li>
+<li>多个零件或者部件，都可以装配到一个对象中，但是产生的运行结果又不想同时。</li>
+<li>产品类非常复杂，或者产品类中的调用顺序不同产生了不同的作用，这个时候使用建造者模式就非常合适。</li>
+<li>当初始化一个对象特别复杂，例如参数多，且很多参数都有默认值时</li>
+</ol>
+<h3 id="简单实现"><a href="#简单实现" class="headerlink" title="简单实现"></a>简单实现</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//抽象类</span></span><br><span class="line"><span class="keyword">package</span> Builder;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">Computer</span> </span>&#123;</span><br><span class="line">    <span class="keyword">protected</span> String mBoard;</span><br><span class="line">    <span class="keyword">protected</span> String mDisplay;</span><br><span class="line">    <span class="keyword">protected</span> String mOS;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="title">Computer</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setBoard</span><span class="params">(String board)</span></span>&#123;</span><br><span class="line">        mBoard=board;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//设置内存</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setDisplay</span><span class="params">(String display)</span></span>&#123;</span><br><span class="line">        mDisplay=display;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//设置操作系统</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">setOS</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;Computer&#123;&quot;</span> +</span><br><span class="line">                <span class="string">&quot;mBoard=&#x27;&quot;</span> + mBoard + <span class="string">&#x27;\&#x27;&#x27;</span> +</span><br><span class="line">                <span class="string">&quot;, mDisplay=&#x27;&quot;</span> + mDisplay + <span class="string">&#x27;\&#x27;&#x27;</span> +</span><br><span class="line">                <span class="string">&quot;, mOS=&#x27;&quot;</span> + mOS + <span class="string">&#x27;\&#x27;&#x27;</span> +</span><br><span class="line">                <span class="string">&#x27;&#125;&#x27;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//Builder类</span></span><br><span class="line"><span class="keyword">package</span> Builder;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">Builder</span> </span>&#123;</span><br><span class="line">    <span class="comment">//设置主机</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">buildBoard</span><span class="params">(String board)</span></span>;</span><br><span class="line">    <span class="comment">//设置显示器</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">buildDisplay</span><span class="params">(String display)</span></span>;</span><br><span class="line">    <span class="comment">//设置操作系统</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">buildOS</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="comment">//创建computer</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> Computer <span class="title">create</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">package</span> Builder;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Director</span> </span>&#123;</span><br><span class="line">    Builder mBuilder=<span class="keyword">null</span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Director</span><span class="params">(Builder builder)</span></span>&#123;</span><br><span class="line">        mBuilder=builder;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">construct</span><span class="params">(String board,String display)</span></span>&#123;</span><br><span class="line">        mBuilder.buildBoard(board);</span><br><span class="line">        mBuilder.buildDisplay(display);</span><br><span class="line">        mBuilder.buildOS();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">package</span> Builder;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Macbook</span> <span class="keyword">extends</span> <span class="title">Computer</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Macbook</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setOS</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        mOS=<span class="string">&quot;MAC OS X 10.10&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">package</span> Builder;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MacbookBuilder</span> <span class="keyword">extends</span> <span class="title">Builder</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> Computer mComputer=<span class="keyword">new</span> Macbook();</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">buildBoard</span><span class="params">(String board)</span> </span>&#123;</span><br><span class="line">        mComputer.setBoard(board);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">buildDisplay</span><span class="params">(String display)</span> </span>&#123;</span><br><span class="line">        mComputer.setDisplay(display);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">buildOS</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        mComputer.setOS();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Computer <span class="title">create</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> mComputer;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//测试类</span></span><br><span class="line"><span class="keyword">package</span> Builder;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Builder builder=<span class="keyword">new</span> MacbookBuilder();</span><br><span class="line">        Director pcDirector=<span class="keyword">new</span> Director(builder);</span><br><span class="line">        pcDirector.construct(<span class="string">&quot;因特尔主板&quot;</span>,<span class="string">&quot;测试显示器&quot;</span>);</span><br><span class="line">        System.out.println(<span class="string">&quot;computer info :&quot;</span>+builder.create().toString());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>执行结果：</strong></p>
+<img src="/blog/2020/03/01/Builder%E6%A8%A1%E5%BC%8F/show.png" class="" title="执行结果">
+
+]]></content>
+      <categories>
+        <category>Android</category>
+      </categories>
+      <tags>
+        <tag>Android</tag>
+        <tag>编码规范</tag>
+        <tag>设计模式</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>hexo博客更新脚本-mac</title>
+    <url>/blog/2020/08/18/hexo%E5%8D%9A%E5%AE%A2%E6%9B%B4%E6%96%B0%E8%84%9A%E6%9C%AC-mac/</url>
+    <content><![CDATA[<p>昨天将博客搬到新电脑了，今天搞了个更新脚本，基本算是自动化吧，特此记录下</p>
+<a id="more"></a>
+
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>系统：macOS</p>
+<p>我目前的博客是采用的是自建服务器，将来没有git服务器搭建需求</p>
+<p>所以采用了scp推送文件到服务器，服务器用nginx去代理（每日定时执行拷贝脚本）</p>
+<p>操作过程中发现2个问题：</p>
+<ol>
+<li><p>要上传的目录中大多文件都是中文名，但是我用scp发送时总是提示报错（无此目录）</p>
+<p>解决办法：</p>
+<p>​            采用了压缩上传目录为英文文件名的压缩包，避免这个问题</p>
+</li>
+<li><p>既然是自动化脚本自然要免密发送，但是macOS scp发送文件是另起线程的，直接在shell脚本中写入不会执行</p>
+<p>解决办法：</p>
+<p>​            expect脚本 系统自带，弊端就是没办法和压缩的shell脚本放在一起，然后我又新建了一个shell脚本来调用这2个脚本</p>
+</li>
+</ol>
+<h2 id="macOS端"><a href="#macOS端" class="headerlink" title="macOS端"></a>macOS端</h2><p>这里我们需要准备3个文件，一个用于压缩要上传文件为source.tar.gz，另一个用于scp上传文件，还有一个用于调用前2个文件</p>
+<p><strong>压缩脚本</strong>：</p>
+<p>​    compress.sh</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#!&#x2F;bin&#x2F;bash</span><br><span class="line">echo &quot;开始压缩文件&quot;</span><br><span class="line">#tar -zcvf 压缩后文件名 要压缩的文件&#x2F;目录</span><br><span class="line">tar -zcvf source.tar.gz myblog&#x2F;public</span><br><span class="line">echo &quot;压缩文件完成&quot;</span><br></pre></td></tr></table></figure>
+
+<p><strong>上传脚本</strong>：</p>
+<p>​    upload.ssh</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#!&#x2F;usr&#x2F;bin&#x2F;expect -f</span><br><span class="line">set user 用户名</span><br><span class="line">set host IP地址</span><br><span class="line">set password 密码</span><br><span class="line">set timeout -1</span><br><span class="line"></span><br><span class="line">spawn scp source.tar.gz $user@$host:&#x2F;home</span><br><span class="line">expect &quot;password:*&quot;</span><br><span class="line">send &quot;$password\r&quot;</span><br><span class="line">interact</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>调用文件</strong>：</p>
+<p>​    update.sh</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">sh compress.sh</span><br><span class="line">echo &quot;开始向服务器发送文件&quot;</span><br><span class="line">expect upload.ssh</span><br><span class="line">echo &quot;发送文件完成，更新成功～&quot;</span><br><span class="line">rm source.tar.gz</span><br><span class="line">echo &quot;删除文件成功～&quot;</span><br></pre></td></tr></table></figure>
+
+<h2 id="服务器端"><a href="#服务器端" class="headerlink" title="服务器端"></a>服务器端</h2><p>服务器端用的是ubuntu，用crontab命令来创建定时任务（ubuntu自带）</p>
+<p><strong>编辑root用户的cron服务</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">sudo crontab -e</span><br></pre></td></tr></table></figure>
+
+<p>第一次创建会提示选用打开的方式，这里我选用了vim打开</p>
+<p><strong>编写定时任务</strong>（每日0点运行服务器端更新脚本）</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># 分钟 小时 天数 月份 星期 要执行的命令  *代表全部时间</span><br><span class="line">0 0 * * * sh &#x2F;home&#x2F;test.sh</span><br></pre></td></tr></table></figure>
+
+<p><strong>执行任务脚本</strong></p>
+<p>这里觉得每日都执行解压更新有点蠢，所以通过shell脚本获取source.tar.gz，修改时间、昨天的时间（当前时间-1天）进行比对，如果修改时间比昨天时间要新才进行更新</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#!&#x2F;bin&#x2F;bash</span><br><span class="line">#文件名</span><br><span class="line">FILE_NAME&#x3D;&#39;source.tar.gz&#39;</span><br><span class="line">#获取文件做后修改时间戳</span><br><span class="line">LAST_MODIFY_TIMESTAMP&#x3D;&#96;stat -c %Y  $FILE_NAME&#96;</span><br><span class="line">#格式化时间戳</span><br><span class="line">formart_date&#x3D;&#96;date &#39;+%Y-%m-%d %H:%M:%S&#39; -d @$LAST_MODIFY_TIMESTAMP&#96;</span><br><span class="line">#获取当前时间</span><br><span class="line">time1&#x3D;$(date -d yesterday &quot;+%Y-%m-%d %H:%M:%S&quot;)</span><br><span class="line">#比较时间 文件时间较新 解压文件到相关目录</span><br><span class="line">if [ &quot;$time1&quot; \&lt; &quot;$formart_date&quot; ]</span><br><span class="line">then</span><br><span class="line">   echo &quot;需要解压文件&quot;</span><br><span class="line">   tar zxvf $FILE_NAME -C blog</span><br><span class="line">fi</span><br></pre></td></tr></table></figure>
+
+<p><strong>注</strong>：</p>
+<ol>
+<li>变量赋值=左右不能有空格</li>
+<li>判断大小需要用 \ 进行转义</li>
+</ol>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>shell脚本基本没接触过，都是网上找的例子，尤其是比对时间大小那里，卡了1个小时才解决。</p>
+<p>也还算是圆满成功吧～✌️</p>
+]]></content>
+      <categories>
+        <category>博客相关</category>
+      </categories>
+      <tags>
+        <tag>博客</tag>
       </tags>
   </entry>
 </search>
