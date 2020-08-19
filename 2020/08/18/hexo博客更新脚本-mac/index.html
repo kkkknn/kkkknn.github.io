@@ -28,7 +28,7 @@
 <meta property="og:description" content="昨天将博客搬到新电脑了，今天搞了个更新脚本，基本算是自动化吧，特此记录下">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2020-08-18T15:13:59.000Z">
-<meta property="article:modified_time" content="2020-08-18T15:53:17.111Z">
+<meta property="article:modified_time" content="2020-08-19T11:56:48.569Z">
 <meta property="article:author" content="kkkkkn">
 <meta property="article:tag" content="博客">
 <meta name="twitter:card" content="summary">
@@ -213,10 +213,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2020-08-18 23:13:59 / 修改时间：23:53:17" itemprop="dateCreated datePublished" datetime="2020-08-18T23:13:59+08:00">2020-08-18</time>
+              <time title="创建时间：2020-08-18 23:13:59" itemprop="dateCreated datePublished" datetime="2020-08-18T23:13:59+08:00">2020-08-18</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-08-19 19:56:48" itemprop="dateModified" datetime="2020-08-19T19:56:48+08:00">2020-08-19</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -276,14 +282,19 @@
 <p><strong>编写定时任务</strong>（每日0点运行服务器端更新脚本）</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 分钟 小时 天数 月份 星期 要执行的命令  *代表全部时间</span><br><span class="line">0 0 * * * sh &#x2F;home&#x2F;test.sh</span><br></pre></td></tr></table></figure>
 
-<p><strong>执行任务脚本</strong></p>
+<p><strong>重启服务器cron服务</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo crontab restart</span><br></pre></td></tr></table></figure>
+
+<p><strong>编写任务脚本</strong></p>
 <p>这里觉得每日都执行解压更新有点蠢，所以通过shell脚本获取source.tar.gz，修改时间、昨天的时间（当前时间-1天）进行比对，如果修改时间比昨天时间要新才进行更新</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">#!&#x2F;bin&#x2F;bash</span><br><span class="line">#文件名</span><br><span class="line">FILE_NAME&#x3D;&#39;source.tar.gz&#39;</span><br><span class="line">#获取文件做后修改时间戳</span><br><span class="line">LAST_MODIFY_TIMESTAMP&#x3D;&#96;stat -c %Y  $FILE_NAME&#96;</span><br><span class="line">#格式化时间戳</span><br><span class="line">formart_date&#x3D;&#96;date &#39;+%Y-%m-%d %H:%M:%S&#39; -d @$LAST_MODIFY_TIMESTAMP&#96;</span><br><span class="line">#获取当前时间</span><br><span class="line">time1&#x3D;$(date -d yesterday &quot;+%Y-%m-%d %H:%M:%S&quot;)</span><br><span class="line">#比较时间 文件时间较新 解压文件到相关目录</span><br><span class="line">if [ &quot;$time1&quot; \&lt; &quot;$formart_date&quot; ]</span><br><span class="line">then</span><br><span class="line">   echo &quot;需要解压文件&quot;</span><br><span class="line">   tar zxvf $FILE_NAME -C blog</span><br><span class="line">fi</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">#!&#x2F;bin&#x2F;bash</span><br><span class="line">source &#x2F;etc&#x2F;profile</span><br><span class="line">cd ~&#x2F;..&#x2F;home</span><br><span class="line">#文件名</span><br><span class="line">FILE_NAME&#x3D;&#39;source.tar.gz&#39;</span><br><span class="line">#获取文件做后修改时间戳</span><br><span class="line">LAST_MODIFY_TIMESTAMP&#x3D;&#96;stat -c %Y  $FILE_NAME&#96;</span><br><span class="line">#格式化时间戳</span><br><span class="line">formart_date&#x3D;&#96;date &#39;+%Y-%m-%d %H:%M:%S&#39; -d @$LAST_MODIFY_TIMESTAMP&#96;</span><br><span class="line">#获取当前时间</span><br><span class="line">time1&#x3D;$(date -d yesterday &quot;+%Y-%m-%d %H:%M:%S&quot;)</span><br><span class="line">#比较时间 文件时间较新 解压文件到相关目录</span><br><span class="line">if [ &quot;$time1&quot; \&lt; &quot;$formart_date&quot; ]</span><br><span class="line">then</span><br><span class="line">   time2&#x3D;$(date &quot;+%Y-%m-%d %H:%M:%S&quot;)</span><br><span class="line">   echo -n $time2 &gt;&gt; &#x2F;home&#x2F;crontab.log</span><br><span class="line">   echo &quot; 文件较新，开始解压文件&quot; &gt;&gt; &#x2F;home&#x2F;crontab.log</span><br><span class="line">   tar zxvf $FILE_NAME -C blog</span><br><span class="line">fi</span><br></pre></td></tr></table></figure>
 
 <p><strong>注</strong>：</p>
 <ol>
 <li>变量赋值=左右不能有空格</li>
 <li>判断大小需要用 \ 进行转义</li>
+<li>使用定时任务时要加载环境变量（source /etc/profile)</li>
+<li>解压文件绝对路径，要先cd到指定目录在进行操作(cd ~/../home)</li>
 </ol>
 <h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>shell脚本基本没接触过，都是网上找的例子，尤其是比对时间大小那里，卡了1个小时才解决。</p>
 <p>也还算是圆满成功吧～✌️</p>
