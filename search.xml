@@ -1172,4 +1172,85 @@
         <tag>设计模式</tag>
       </tags>
   </entry>
+  <entry>
+    <title>组合模式</title>
+    <url>/2020/09/12/%E7%BB%84%E5%90%88%E6%A8%A1%E5%BC%8F/</url>
+    <content><![CDATA[<p>物以类聚-组合模式</p>
+<a id="more"></a>
+
+<h2 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h2><p>将对象组合成树形结构以表示“部分-整体”的层次结构，使得用户对单个对象和组合对象的使用具有一致性</p>
+<h2 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h2><p>表示对象的部分-整体层次机构时</p>
+<p>从一个整体中能够独立出部分模块或功能的场景</p>
+<h2 id="简单实现"><a href="#简单实现" class="headerlink" title="简单实现"></a>简单实现</h2><p><strong>表示文件和文件夹抽象类</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package CombinedMode;</span><br><span class="line"></span><br><span class="line">import java.util.ArrayList;</span><br><span class="line">import java.util.List;</span><br><span class="line"></span><br><span class="line">public abstract class Dir &#123;</span><br><span class="line">    &#x2F;&#x2F;声明一个list成员变量存储文件夹下的所有元素</span><br><span class="line">    protected List&lt;Dir&gt; dirs&#x3D;new ArrayList&lt;Dir&gt;();</span><br><span class="line"></span><br><span class="line">    private String name;&#x2F;&#x2F;当前文件夹或用户名</span><br><span class="line">    public Dir(String name)&#123;</span><br><span class="line">        this.name&#x3D;name;</span><br><span class="line">    &#125;</span><br><span class="line">    &#x2F;&#x2F;添加一个文件或文件夹</span><br><span class="line">    public abstract void addDir(Dir dir);</span><br><span class="line">    &#x2F;&#x2F;移除一个文件或文件夹</span><br><span class="line">    public abstract void rmDir(Dir dir);</span><br><span class="line">    &#x2F;&#x2F;清空文件夹内的所有元素</span><br><span class="line">    public abstract void clear();</span><br><span class="line">    &#x2F;&#x2F;输出文件夹目录结构</span><br><span class="line">    public abstract void print();</span><br><span class="line">    &#x2F;&#x2F;获取文件夹内所有文件或者子文件夹</span><br><span class="line">    public abstract List&lt;Dir&gt; getFiles();</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F;获取文件或文件夹名字</span><br><span class="line">    public String getName()&#123;</span><br><span class="line">        return name;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>表示文件夹的类</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package CombinedMode;</span><br><span class="line"></span><br><span class="line">import java.util.Iterator;</span><br><span class="line">import java.util.List;</span><br><span class="line"></span><br><span class="line">public class Folder extends Dir &#123;</span><br><span class="line">    public Folder(String name)&#123;</span><br><span class="line">        super(name);</span><br><span class="line">    &#125;</span><br><span class="line">    public void addDir(Dir dir) &#123;</span><br><span class="line">        dirs.add(dir);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void rmDir(Dir dir) &#123;</span><br><span class="line">        dirs.remove(dir);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void clear() &#123;</span><br><span class="line">        dirs.clear();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void print() &#123;</span><br><span class="line">        System.out.print(getName()+&quot;(&quot;);</span><br><span class="line">        Iterator&lt;Dir&gt; iterator&#x3D;dirs.iterator();</span><br><span class="line">        while (iterator.hasNext())&#123;</span><br><span class="line">            Dir dir&#x3D;iterator.next();</span><br><span class="line">            dir.print();</span><br><span class="line">            if(iterator.hasNext())&#123;</span><br><span class="line">                System.out.print(&quot;,&quot;);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.print(&quot;)&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public List&lt;Dir&gt; getFiles() &#123;</span><br><span class="line">        return dirs;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>表示文件的类</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package CombinedMode;</span><br><span class="line"></span><br><span class="line">import java.util.List;</span><br><span class="line"></span><br><span class="line">public class File extends Dir &#123;</span><br><span class="line">    public File(String name)&#123;</span><br><span class="line">        super(name);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void addDir(Dir dir) &#123;</span><br><span class="line">        throw new UnsupportedOperationException(&quot;文件对象不支持该操作&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void rmDir(Dir dir) &#123;</span><br><span class="line">        throw new UnsupportedOperationException(&quot;文件对象不支持该操作&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void clear() &#123;</span><br><span class="line">        throw new UnsupportedOperationException(&quot;文件对象不支持该操作&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void print() &#123;</span><br><span class="line">        System.out.print(getName());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public List&lt;Dir&gt; getFiles() &#123;</span><br><span class="line">        throw new UnsupportedOperationException(&quot;文件对象不支持该操作&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>测试类</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package CombinedMode;</span><br><span class="line"></span><br><span class="line">public class Client &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        Dir diskC&#x3D;new Folder(&quot;C&quot;);</span><br><span class="line">        diskC.addDir(new File(&quot;image.txt&quot;));</span><br><span class="line"></span><br><span class="line">        Dir dirWin&#x3D;new Folder(&quot;Windows&quot;);</span><br><span class="line">        dirWin.addDir(new File(&quot;explorer.exe&quot;));</span><br><span class="line">        diskC.addDir(dirWin);</span><br><span class="line"></span><br><span class="line">        Dir dirPer&#x3D;new Folder(&quot;PerfLogs&quot;);</span><br><span class="line">        dirPer.addDir(new File(&quot;null.txt&quot;));</span><br><span class="line">        diskC.addDir(dirPer);</span><br><span class="line"></span><br><span class="line">        Dir dirPro&#x3D;new Folder(&quot;Program file&quot;);</span><br><span class="line">        dirPro.addDir(new File(&quot;ftp.txt&quot;));</span><br><span class="line">        diskC.addDir(dirPro);</span><br><span class="line"></span><br><span class="line">        diskC.print();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>输出结果</strong></p>
+<img src="/2020/09/12/%E7%BB%84%E5%90%88%E6%A8%A1%E5%BC%8F/show.png" class="" title="执行结果">
+
+
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p><strong>优点</strong></p>
+<ol>
+<li>组合模式可以清楚地定义分层次的复杂对象，表示对象的全部或部分层次，他让高层模块忽略了层次的差异，方便对整个层次结构进行控制</li>
+<li>高层模块可以一致的使用一个组合结构或其中单个对象，不必关心处理的是单个对象还是整个组合结构，简化了高层模块的代码</li>
+<li>在组合模式中增加了新的枝干构件和叶子构件都很方便，无需对现有类库进行任何修改，符合“开闭原则”</li>
+<li>组合模式为树形结构的面向对象实现提供实现提供了一种灵活的解决方案，通过叶子对象和枝干对象的递归组合，可以形成复杂的树形结构，但对树形结构的控制却非常简单</li>
+</ol>
+<p><strong>缺点</strong></p>
+<ol>
+<li>在新增构件时不好对枝干中的构件类型进行限制，不能依赖类型系统来施加这些约束，因为在大多数情况下，它们都来自于相同的抽象层，此时，必须行时进行类型检查来实现，这个实现过程较为复杂</li>
+</ol>
+]]></content>
+      <categories>
+        <category>Android</category>
+      </categories>
+      <tags>
+        <tag>Android</tag>
+        <tag>编码规范</tag>
+        <tag>设计模式</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>代理模式</title>
+    <url>/2020/09/12/%E4%BB%A3%E7%90%86%E6%A8%A1%E5%BC%8F/</url>
+    <content><![CDATA[<p>编程好帮手-代理模式</p>
+<a id="more"></a>
+
+<h2 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h2><p>为其他对象提供一种代理以控制对这个对象的访问</p>
+<h2 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h2><p>当无法或者不想直接访问某个对象或访问某个对象存在困难时可以通过一个代理对象来间接访问，为了保证客户端使用的透明性，委托对象与代理对象需要实现相同的接口</p>
+<h2 id="简单实现"><a href="#简单实现" class="headerlink" title="简单实现"></a>简单实现</h2><p><strong>诉讼接口类</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package ProxyPattern;</span><br><span class="line"></span><br><span class="line">public interface ILawsuit &#123;</span><br><span class="line">    &#x2F;&#x2F;提交申请</span><br><span class="line">    void submit();</span><br><span class="line">    &#x2F;&#x2F;进行举证</span><br><span class="line">    void burden();</span><br><span class="line">    &#x2F;&#x2F;开始辩护</span><br><span class="line">    void defend();</span><br><span class="line">    &#x2F;&#x2F;诉讼完成</span><br><span class="line">    void finish();</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>具体诉讼人</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package ProxyPattern;</span><br><span class="line"></span><br><span class="line">public class XiaoMin implements ILawsuit &#123;</span><br><span class="line">    public void submit() &#123;</span><br><span class="line">        System.out.println(&quot;老板拖欠工资，特此申请仲裁&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void burden() &#123;</span><br><span class="line">        System.out.println(&quot;这是合同书和过去一年的银行工资流水&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void defend() &#123;</span><br><span class="line">        System.out.println(&quot;证据确凿，不需要在说什么了&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void finish() &#123;</span><br><span class="line">        System.out.println(&quot;诉讼成功，判决老板即日起七天内结算工资&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>代理律师</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package ProxyPattern;</span><br><span class="line"></span><br><span class="line">public class Lawyer implements ILawsuit &#123;</span><br><span class="line">    private ILawsuit lawsuit;</span><br><span class="line"></span><br><span class="line">    public Lawyer(ILawsuit lawsuit) &#123;</span><br><span class="line">        this.lawsuit &#x3D; lawsuit;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void submit() &#123;</span><br><span class="line">        lawsuit.submit();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void burden() &#123;</span><br><span class="line">        lawsuit.burden();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void defend() &#123;</span><br><span class="line">        lawsuit.defend();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void finish() &#123;</span><br><span class="line">        lawsuit.finish();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>动态代理类</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package ProxyPattern;</span><br><span class="line"></span><br><span class="line">import java.lang.reflect.InvocationHandler;</span><br><span class="line">import java.lang.reflect.Method;</span><br><span class="line"></span><br><span class="line">public class DynamicProxy implements InvocationHandler &#123;</span><br><span class="line">    private Object object;</span><br><span class="line"></span><br><span class="line">    public DynamicProxy(Object object) &#123;</span><br><span class="line">        this.object &#x3D; object;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable &#123;</span><br><span class="line">        &#x2F;&#x2F;调用被代理类对象的方法</span><br><span class="line">        Object result&#x3D;method.invoke(object,args);</span><br><span class="line">        return result;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>测试类</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package ProxyPattern;</span><br><span class="line"></span><br><span class="line">import java.lang.reflect.Proxy;</span><br><span class="line"></span><br><span class="line">public class Client &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        &#x2F;* 静态代理</span><br><span class="line">        &#x2F;&#x2F;构造一个小民————</span><br><span class="line">        ILawsuit xiaomin&#x3D;new XiaoMin();</span><br><span class="line">        &#x2F;&#x2F;构造一个代理律师并将小民作为构造参数传递进去</span><br><span class="line">        ILawsuit lawyer&#x3D;new Lawyer(xiaomin);</span><br><span class="line">        &#x2F;&#x2F;律师提交诉讼申请</span><br><span class="line">        lawyer.submit();</span><br><span class="line">        &#x2F;&#x2F;律师进行举证</span><br><span class="line">        lawyer.burden();</span><br><span class="line">        &#x2F;&#x2F;律师代替小民进行辩护</span><br><span class="line">        lawyer.defend();</span><br><span class="line">        &#x2F;&#x2F;完成诉讼</span><br><span class="line">        lawyer.finish();*&#x2F;</span><br><span class="line"></span><br><span class="line">        &#x2F;&#x2F;----动态代理</span><br><span class="line">        &#x2F;&#x2F;构造一个小民</span><br><span class="line">        ILawsuit xiaomin&#x3D;new XiaoMin();</span><br><span class="line">        &#x2F;&#x2F;构造一个动态代理</span><br><span class="line">        DynamicProxy proxy&#x3D;new DynamicProxy(xiaomin);</span><br><span class="line">        &#x2F;&#x2F;获取被代理类小民的classloader</span><br><span class="line">        ClassLoader loader&#x3D;xiaomin.getClass().getClassLoader();</span><br><span class="line">        &#x2F;&#x2F;动态构造一个代理者律师</span><br><span class="line">        ILawsuit lawyer&#x3D; (ILawsuit) Proxy.newProxyInstance(loader,new Class[]&#123;ILawsuit.class&#125;,proxy);</span><br><span class="line">        &#x2F;&#x2F;律师提交诉讼申请</span><br><span class="line">        lawyer.submit();</span><br><span class="line">        &#x2F;&#x2F;律师进行指证</span><br><span class="line">        lawyer.burden();</span><br><span class="line">        &#x2F;&#x2F;律师代替小民进行辩护</span><br><span class="line">        lawyer.defend();</span><br><span class="line">        &#x2F;&#x2F;完成诉讼</span><br><span class="line">        lawyer.finish();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>输出结果</strong></p>
+<img src="/2020/09/12/%E4%BB%A3%E7%90%86%E6%A8%A1%E5%BC%8F/show.png" class="" title="执行结果">]]></content>
+      <categories>
+        <category>Android</category>
+      </categories>
+      <tags>
+        <tag>Android</tag>
+        <tag>编码规范</tag>
+        <tag>设计模式</tag>
+      </tags>
+  </entry>
 </search>
