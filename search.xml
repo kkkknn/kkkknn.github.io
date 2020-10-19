@@ -1319,4 +1319,90 @@
         <tag>设计模式</tag>
       </tags>
   </entry>
+  <entry>
+    <title>享元模式</title>
+    <url>/2020/10/19/%E4%BA%AB%E5%85%83%E6%A8%A1%E5%BC%8F/</url>
+    <content><![CDATA[<p>对象共享、避免创建多对象-享元模式</p>
+<a id="more"></a>
+
+<h2 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h2><p>使用共享对象可有效的支持大量的细粒度的对象</p>
+<h2 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h2><ol>
+<li>系统中存在大量的相似对象</li>
+<li>细粒度的对象都具备接近的外部形态，而且内部状态与环境无关，也就是说对象没有特定身份</li>
+<li>需要缓冲池的场景</li>
+</ol>
+<h2 id="简单实现"><a href="#简单实现" class="headerlink" title="简单实现"></a>简单实现</h2><p><strong>车票工厂</strong>:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package XiangyuanMode;</span><br><span class="line"></span><br><span class="line">import java.util.Map;</span><br><span class="line">import java.util.concurrent.ConcurrentHashMap;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F;车票工厂，以出发地和目的地为key缓存车票</span><br><span class="line">public class TicketFactory &#123;</span><br><span class="line">    static Map&lt;String,Ticket&gt; sTicketMap&#x3D;new ConcurrentHashMap&lt;String, Ticket&gt;();</span><br><span class="line">    public static Ticket getTicket(String from,String to)&#123;</span><br><span class="line">        String key&#x3D;from+&quot;-&quot;+to;</span><br><span class="line">        if(sTicketMap.containsKey(key))&#123;</span><br><span class="line">            System.out.println(&quot;使用缓存&#x3D;&#x3D;&gt;&quot;+key);</span><br><span class="line">            return sTicketMap.get(key);</span><br><span class="line">        &#125;else&#123;</span><br><span class="line">            System.out.println(&quot;创建对象&#x3D;&#x3D;&gt;&quot;+key);</span><br><span class="line">            Ticket ticket&#x3D;new TrainTicket(from,to);</span><br><span class="line">            sTicketMap.put(key, ticket);</span><br><span class="line">            return ticket;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>实体类</strong>：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package XiangyuanMode;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">import java.util.Random;</span><br><span class="line"></span><br><span class="line">public class TrainTicket implements Ticket &#123;</span><br><span class="line">    public String from;&#x2F;&#x2F;出发地</span><br><span class="line">    public String to;&#x2F;&#x2F;目的地</span><br><span class="line">    public String bunk;&#x2F;&#x2F;铺位</span><br><span class="line">    public int price;</span><br><span class="line"></span><br><span class="line">    public TrainTicket(String from, String to) &#123;</span><br><span class="line">        this.from &#x3D; from;</span><br><span class="line">        this.to &#x3D; to;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void showTicketInfo(String bunk) &#123;</span><br><span class="line">        price&#x3D;new Random().nextInt(300);</span><br><span class="line">        System.out.println(&quot;购买 从&quot;+from+&quot;到&quot;+to+&quot;的&quot;+bunk+&quot;火车票，价格:&quot;+price);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>接口类</strong>：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package XiangyuanMode;</span><br><span class="line"></span><br><span class="line">public interface Ticket &#123;</span><br><span class="line">    public void showTicketInfo(String bunk);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>测试类</strong>：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package XiangyuanMode;</span><br><span class="line"></span><br><span class="line">public class Test &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        Ticket ticket1&#x3D;TicketFactory.getTicket(&quot;北京&quot;,&quot;青岛&quot;);</span><br><span class="line">        ticket1.showTicketInfo(&quot;上铺&quot;);</span><br><span class="line">        Ticket ticket2&#x3D;TicketFactory.getTicket(&quot;北京&quot;,&quot;青岛&quot;);</span><br><span class="line">        ticket2.showTicketInfo(&quot;中铺&quot;);</span><br><span class="line">        Ticket ticket3&#x3D;TicketFactory.getTicket(&quot;北京&quot;,&quot;青岛&quot;);</span><br><span class="line">        ticket3.showTicketInfo(&quot;下铺&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>输出结果</strong>：</p>
+<img src="/2020/10/19/%E4%BA%AB%E5%85%83%E6%A8%A1%E5%BC%8F/222.png" class="" title="执行结果">
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p><strong>优点</strong>：</p>
+<ul>
+<li>​    大幅降低了内存中对象的数量</li>
+</ul>
+<p><strong>缺点</strong>:</p>
+<ul>
+<li>使系统更加复杂。为了使对象可以共享，需要将一些状态外部化，这使得程序的逻辑复杂化。</li>
+<li>享元模式将享元对象的状态外部化，而读取外部状态使得运行时间稍微变长</li>
+</ul>
+]]></content>
+      <categories>
+        <category>Android</category>
+      </categories>
+      <tags>
+        <tag>Android</tag>
+        <tag>编码规范</tag>
+        <tag>设计模式</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>装饰模式</title>
+    <url>/2020/10/19/%E8%A3%85%E9%A5%B0%E6%A8%A1%E5%BC%8F/</url>
+    <content><![CDATA[<p>装饰模式，也称为包装模式，结构型设计模式之一</p>
+<a id="more"></a>
+
+<h2 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h2><p>动态的给一个对象添加一些额外的职责，就增加功能来说，装饰模式相比生成子类更为灵活</p>
+<h2 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h2><p>需要透明且动态的扩展类的功能时</p>
+<h2 id="简单实现"><a href="#简单实现" class="headerlink" title="简单实现"></a>简单实现</h2><p><strong>抽象组件类：</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package DecorationMode;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F;抽象组件类</span><br><span class="line">public abstract class Component &#123;</span><br><span class="line">    public abstract void operate();</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>组件具体实现类</strong>：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package DecorationMode;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F;组件具体实现类</span><br><span class="line">public class ConcreteComponent extends Component &#123;</span><br><span class="line">    public void operate() &#123;</span><br><span class="line">        System.out.println(&quot;具体逻辑执行内容&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>抽象装饰者</strong>：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package DecorationMode;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F;抽象装饰者</span><br><span class="line">public class Decorator extends Component &#123;</span><br><span class="line">    private Component component;</span><br><span class="line"></span><br><span class="line">    public Decorator(Component component) &#123;</span><br><span class="line">        this.component &#x3D; component;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void operate() &#123;</span><br><span class="line">        component.operate();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>装饰者具体实现类A：</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package DecorationMode;</span><br><span class="line"></span><br><span class="line">public class ConcreteDecoratorA extends Decorator &#123;</span><br><span class="line">    public ConcreteDecoratorA(Component component) &#123;</span><br><span class="line">        super(component);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void operate() &#123;</span><br><span class="line">        operateA();</span><br><span class="line">        super.operate();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void operateA()&#123;</span><br><span class="line">        &#x2F;&#x2F;装饰方法逻辑</span><br><span class="line">        System.out.println(&quot;装饰方法罗技&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>装饰者具体实现类B：</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package DecorationMode;</span><br><span class="line"></span><br><span class="line">public class ConcreteDecoratorB extends Decorator &#123;</span><br><span class="line"></span><br><span class="line">    public ConcreteDecoratorB(Component component) &#123;</span><br><span class="line">        super(component);</span><br><span class="line">    &#125;</span><br><span class="line">    @Override</span><br><span class="line">    public void operate() &#123;</span><br><span class="line">        opearteB();</span><br><span class="line">        super.operate();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void opearteB()&#123;</span><br><span class="line">        System.out.println(&quot;自定义的装饰方法B&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>测试类：</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package DecorationMode;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F;程序测试类</span><br><span class="line">public class Client &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        &#x2F;&#x2F;构造被装饰的组件对象</span><br><span class="line">        Component component&#x3D;new ConcreteComponent();</span><br><span class="line"></span><br><span class="line">        &#x2F;&#x2F;根据组件对象构造装饰者对象A并调用 此时相当于给组件对象增加装饰者A的功能方法</span><br><span class="line">        Decorator decorator&#x3D;new ConcreteDecoratorA(component);</span><br><span class="line">        decorator.operate();</span><br><span class="line"></span><br><span class="line">        Decorator decorator1&#x3D;new ConcreteDecoratorB(component);</span><br><span class="line">        decorator1.operate();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>输出结果</strong>：</p>
+<img src="/2020/10/19/%E8%A3%85%E9%A5%B0%E6%A8%A1%E5%BC%8F/255.png" class="" title="执行结果">
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>装饰模式是以对客户端透明的方式扩展对象的功能，是继承关系的一个替代方案</p>
+]]></content>
+      <categories>
+        <category>Android</category>
+      </categories>
+      <tags>
+        <tag>Android</tag>
+        <tag>编码规范</tag>
+        <tag>设计模式</tag>
+      </tags>
+  </entry>
 </search>
