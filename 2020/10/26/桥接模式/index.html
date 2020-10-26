@@ -20,24 +20,22 @@
     var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="时势造英雄-策略模式">
+  <meta name="description" content="连接两地的交通枢纽-桥接模式">
 <meta property="og:type" content="article">
-<meta property="og:title" content="策略模式">
-<meta property="og:url" content="http://yoursite.com/2020/03/22/%E7%AD%96%E7%95%A5%E6%A8%A1%E5%BC%8F/index.html">
+<meta property="og:title" content="桥接模式">
+<meta property="og:url" content="http://yoursite.com/2020/10/26/%E6%A1%A5%E6%8E%A5%E6%A8%A1%E5%BC%8F/index.html">
 <meta property="og:site_name" content="kkkkkn&#39;s的博客">
-<meta property="og:description" content="时势造英雄-策略模式">
+<meta property="og:description" content="连接两地的交通枢纽-桥接模式">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://yoursite.com/2020/03/22/%E7%AD%96%E7%95%A5%E6%A8%A1%E5%BC%8F/show.png">
-<meta property="article:published_time" content="2020-03-22T14:11:19.000Z">
-<meta property="article:modified_time" content="2020-04-19T08:39:04.000Z">
+<meta property="article:published_time" content="2020-10-26T13:58:12.000Z">
+<meta property="article:modified_time" content="2020-10-26T14:01:08.719Z">
 <meta property="article:author" content="kkkkkn">
 <meta property="article:tag" content="Android">
 <meta property="article:tag" content="编码规范">
 <meta property="article:tag" content="设计模式">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://yoursite.com/2020/03/22/%E7%AD%96%E7%95%A5%E6%A8%A1%E5%BC%8F/show.png">
 
-<link rel="canonical" href="http://yoursite.com/2020/03/22/%E7%AD%96%E7%95%A5%E6%A8%A1%E5%BC%8F/">
+<link rel="canonical" href="http://yoursite.com/2020/10/26/%E6%A1%A5%E6%8E%A5%E6%A8%A1%E5%BC%8F/">
 
 
 <script id="page-configurations">
@@ -50,7 +48,7 @@
   };
 </script>
 
-  <title>策略模式 | kkkkkn's的博客</title>
+  <title>桥接模式 | kkkkkn's的博客</title>
   
 
 
@@ -195,7 +193,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/03/22/%E7%AD%96%E7%95%A5%E6%A8%A1%E5%BC%8F/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/10/26/%E6%A1%A5%E6%8E%A5%E6%A8%A1%E5%BC%8F/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -208,7 +206,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          策略模式
+          桥接模式
         </h1>
 
         <div class="post-meta">
@@ -217,16 +215,10 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
+              
 
-              <time title="创建时间：2020-03-22 22:11:19" itemprop="dateCreated datePublished" datetime="2020-03-22T22:11:19+08:00">2020-03-22</time>
+              <time title="创建时间：2020-10-26 21:58:12 / 修改时间：22:01:08" itemprop="dateCreated datePublished" datetime="2020-10-26T21:58:12+08:00">2020-10-26</time>
             </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-04-19 16:39:04" itemprop="dateModified" datetime="2020-04-19T16:39:04+08:00">2020-04-19</time>
-              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -248,43 +240,44 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>时势造英雄-策略模式</p>
+        <p>连接两地的交通枢纽-桥接模式</p>
 <a id="more"></a>
 
-<p>##　模式简介</p>
-<p>策略模式定义了一系列的算法，并将每一个算法独立封装起来，而且使它们还可以相互替换。策略模式让算法独立于它的客户而独立变化</p>
-<h2 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h2><ul>
-<li>针对同一类型问题的多种处理方式，仅仅是具体行为有差别时。</li>
-<li>需要安全的封装多种同一类型的操作时</li>
-<li>出现同一抽象类有多个子类，而又需要使用if-else或者switch-case来选择子类时</li>
-</ul>
-<h2 id="简单实现"><a href="#简单实现" class="headerlink" title="简单实现"></a>简单实现</h2><p>以计算公交车和地铁票价为例子</p>
-<p><strong>计算接口</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">public interface CalculateStrategy &#123;</span><br><span class="line">    &#x2F;&#x2F;根据距离计算价格</span><br><span class="line">    int calculatePrice(int km);</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p><strong>公交车计算</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;公交车的价格计算策略</span><br><span class="line">public class BudStrategy implements CalculateStrategy &#123;</span><br><span class="line">    &#x2F;&#x2F;10公里内1元，超过10公里每5公里加收1元</span><br><span class="line">    public int calculatePrice(int km) &#123;</span><br><span class="line">        int extraTotal &#x3D; km -10;</span><br><span class="line">        int extraFactor &#x3D; extraTotal&#x2F;5;</span><br><span class="line">        int fraction&#x3D;extraTotal%5;</span><br><span class="line">        &#x2F;&#x2F;价格计算，分段式计价</span><br><span class="line">        int price&#x3D;1+extraFactor*1;</span><br><span class="line">        return fraction&gt;0?++price:price;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>地铁计算</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;地铁的价格计算策略</span><br><span class="line">public class SubwayStrategy implements CalculateStrategy &#123;</span><br><span class="line">    public int calculatePrice(int km) &#123;</span><br><span class="line">        &#x2F;&#x2F;6公里内3元，6~12 4元  12~22 5元  22~32 6元</span><br><span class="line">        if(km&lt;&#x3D;6)&#123;</span><br><span class="line">            return 3;</span><br><span class="line">        &#125;else if(km&gt;6&amp;&amp;km&lt;12)&#123;</span><br><span class="line">            return 4;</span><br><span class="line">        &#125;else if(km&gt;12&amp;&amp;km&lt;22)&#123;</span><br><span class="line">            return 5;</span><br><span class="line">        &#125;else if(km&gt;22&amp;&amp;km&lt;32)&#123;</span><br><span class="line">            return 6;</span><br><span class="line">        &#125;</span><br><span class="line">        &#x2F;&#x2F;其他距离简化7元</span><br><span class="line">        return 7;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>调用实现的测试类</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">public class TranficCalculator &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        TranficCalculator tranficCalculator&#x3D;new TranficCalculator();</span><br><span class="line">        &#x2F;&#x2F;设置策略</span><br><span class="line">        tranficCalculator.setCalculateStrategy(new BudStrategy());</span><br><span class="line">        int price&#x3D;tranficCalculator.calculatePrice(16);</span><br><span class="line">        System.out.println(&quot;公交车乘坐16公里的价格&quot;+price);</span><br><span class="line">    &#125;</span><br><span class="line">    CalculateStrategy mCalculateStrategy;</span><br><span class="line">    public void setCalculateStrategy(CalculateStrategy calculateStrategy)&#123;</span><br><span class="line">        this.mCalculateStrategy&#x3D;calculateStrategy;</span><br><span class="line">    &#125;</span><br><span class="line">    public int calculatePrice(int km)&#123;</span><br><span class="line">        return mCalculateStrategy.calculatePrice(km);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p><strong>执行结果</strong></p>
-<img src="/2020/03/22/%E7%AD%96%E7%95%A5%E6%A8%A1%E5%BC%8F/show.png" class="" title="执行结果">
-
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>​    建立抽象，将不同的策略构建成一个具体策略实现，通过不同的策略实现算法替换。在简化逻辑、结构的同时，增强了系统的可读性、稳定性、可拓展性、这对于较为复杂的业务显得更为直观，拓展也更为方便</p>
-<p><strong>优点</strong></p>
-<ol>
-<li>结构清晰明了，使用简单直观</li>
-<li>耦合度相对而言降低，拓展方便</li>
-<li>操作封装也更为彻底，数据更为安全</li>
+<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>桥接模式也称为桥梁模式，是结构型设计模式之一。</p>
+<p><strong>定义</strong>：将抽象部分与现实部分分离，使它们都可以独立的进行变化</p>
+<h2 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h2><ol>
+<li>如果一个系统需要在构件的抽象化角色和具体化角色之间增加更多的灵活性，避免在两个层次之间建立静态的继承关系，可以通过桥接模式使它们在抽象层建立一个关联关系</li>
+<li>对于那些不希望使用继承或因为多层次继承导致系统类的个数极具增加的系统，也可以考虑使用桥接模式</li>
+<li>一个类存在两个独立变化的维度，且这两个维度都需要进行拓展</li>
 </ol>
-<p><strong>缺点</strong></p>
-<ol>
-<li>随着策略的增加，子类也会变得繁多</li>
-</ol>
+<h2 id="简单实现"><a href="#简单实现" class="headerlink" title="简单实现"></a>简单实现</h2><p><strong>咖啡抽象类：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">package BridgingMode;</span><br><span class="line"></span><br><span class="line">public abstract class Coffee &#123;</span><br><span class="line">    protected CoffeeAdditives impl;</span><br><span class="line"></span><br><span class="line">    public Coffee(CoffeeAdditives impl) &#123;</span><br><span class="line">        this.impl &#x3D; impl;</span><br><span class="line">    &#125;</span><br><span class="line">    public abstract void makeCoffee();</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>口味抽象类：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">package BridgingMode;</span><br><span class="line"></span><br><span class="line">public abstract class CoffeeAdditives &#123;</span><br><span class="line">    &#x2F;&#x2F;咖啡添加</span><br><span class="line">    public abstract String addSomeThing();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>大杯咖啡：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">package BridgingMode;</span><br><span class="line"></span><br><span class="line">public class LargeCoffee extends Coffee &#123;</span><br><span class="line">    public LargeCoffee(CoffeeAdditives impl) &#123;</span><br><span class="line">        super(impl);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void makeCoffee() &#123;</span><br><span class="line">        System.out.println(&quot;大杯的&quot;+impl+&quot;咖啡&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>小杯咖啡：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">package BridgingMode;</span><br><span class="line"></span><br><span class="line">public class SmallCoffee extends Coffee &#123;</span><br><span class="line">    public SmallCoffee(CoffeeAdditives impl) &#123;</span><br><span class="line">        super(impl);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void makeCoffee() &#123;</span><br><span class="line">        System.out.println(&quot;小杯的&quot;+impl+&quot;咖啡&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>原味：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">package BridgingMode;</span><br><span class="line"></span><br><span class="line">public class Ordinary extends CoffeeAdditives &#123;</span><br><span class="line">    public String addSomeThing() &#123;</span><br><span class="line">        return &quot;原味&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>加糖：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">package BridgingMode;</span><br><span class="line"></span><br><span class="line">public class Sugar extends CoffeeAdditives &#123;</span><br><span class="line">    public String addSomeThing() &#123;</span><br><span class="line">        return &quot;加糖&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>测试类</strong>：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">package BridgingMode;</span><br><span class="line"></span><br><span class="line">public class Test &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        &#x2F;&#x2F;原汁原味</span><br><span class="line">        Ordinary ordinary&#x3D;new Ordinary();</span><br><span class="line">        &#x2F;&#x2F;准备糖类</span><br><span class="line">        Sugar sugar&#x3D;new Sugar();</span><br><span class="line"></span><br><span class="line">        &#x2F;&#x2F;大杯咖啡，原味</span><br><span class="line">        LargeCoffee coffee1&#x3D;new LargeCoffee(ordinary);</span><br><span class="line">        coffee1.makeCoffee();</span><br><span class="line">        &#x2F;&#x2F;小杯咖啡，原味</span><br><span class="line">        SmallCoffee coffee2&#x3D;new SmallCoffee(ordinary);</span><br><span class="line">        coffee2.makeCoffee();</span><br><span class="line"></span><br><span class="line">        &#x2F;&#x2F;大杯咖啡，加糖</span><br><span class="line">        LargeCoffee largeCoffee&#x3D;new LargeCoffee(sugar);</span><br><span class="line">        largeCoffee.makeCoffee();</span><br><span class="line">        &#x2F;&#x2F;小杯咖啡，加糖</span><br><span class="line">        SmallCoffee smallCoffee&#x3D;new SmallCoffee(sugar);</span><br><span class="line">        smallCoffee.makeCoffee();</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>输出结果</strong>：</p>
+
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p><strong>优点</strong>：</p>
+<p>​    分离抽象与实现、灵活的拓展以及对客户来说透明的实现等，    </p>
+<p><strong>缺点</strong>：</p>
+<p>​    不容易设计，对开发者来说有一定的经验要求。因此，对桥接模式来说，理解很简单，设计却不容易。</p>
 
     </div>
 
@@ -305,13 +298,10 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2020/03/22/%E6%8A%BD%E8%B1%A1%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F/" rel="prev" title="抽象工厂模式">
-      <i class="fa fa-chevron-left"></i> 抽象工厂模式
+    <a href="/2020/10/26/%E5%A4%96%E8%A7%82%E6%A8%A1%E5%BC%8F/" rel="prev" title="外观模式">
+      <i class="fa fa-chevron-left"></i> 外观模式
     </a></div>
-      <div class="post-nav-item">
-    <a href="/2020/04/19/%E7%8A%B6%E6%80%81%E6%A8%A1%E5%BC%8F/" rel="next" title="状态模式">
-      状态模式 <i class="fa fa-chevron-right"></i>
-    </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -370,7 +360,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-text">使用场景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E5%8D%95%E5%AE%9E%E7%8E%B0"><span class="nav-text">简单实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-text">总结</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%8B%E7%BB%8D"><span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-text">使用场景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E5%8D%95%E5%AE%9E%E7%8E%B0"><span class="nav-text">简单实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-text">总结</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 

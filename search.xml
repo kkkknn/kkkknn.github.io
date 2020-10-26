@@ -1405,4 +1405,107 @@
         <tag>设计模式</tag>
       </tags>
   </entry>
+  <entry>
+    <title>外观模式</title>
+    <url>/2020/10/26/%E5%A4%96%E8%A7%82%E6%A8%A1%E5%BC%8F/</url>
+    <content><![CDATA[<p>统一编程接口-外观模式</p>
+<a id="more"></a>
+
+<h2 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h2><p>要求一个子系统的外部与其内部的通信必须通过一个统一的对象进行。门面模式（Facade模式）提供一个高层次的接口，使得子系统更易于使用</p>
+<h2 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h2><ol>
+<li>为一个复杂子系统提供一个简单接口。子系统往往因为不断演化而变得越来越复杂，甚至可能被替换。大多数模式使用时都会产生更多，更小的类，在这使子系统更具可重用行的同时也更容易对子系统进行定制、修改，这种易变性使得隐藏藏子系统的具体实现变得尤其重要。Facade可以提供一个简单统一的接口，对外隐藏子系统的具体实现、隔离变化；</li>
+<li>当你需要构建一个层次结构的子系统时，使用Facade模式定义子系统中每层的入口点。如果子系统之间是相互依赖的，你可以让他们仅通过Facade接口进行通信，从而简化了他们之间的依赖关系。</li>
+</ol>
+<h2 id="简单示例"><a href="#简单示例" class="headerlink" title="简单示例"></a>简单示例</h2><p><strong>MobilePhone类：</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package FacadeMode;</span><br><span class="line"></span><br><span class="line">public class MobilePhone &#123;</span><br><span class="line">    private Phone mPhone&#x3D;new PhoneImpl();</span><br><span class="line">    private Camera mCamera&#x3D;new CameraImpl();</span><br><span class="line"></span><br><span class="line">    public void dail()&#123;</span><br><span class="line">        mPhone.dail();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void videoChat()&#123;</span><br><span class="line">        System.out.println(&quot;&#x3D;&#x3D;&gt;视频通话连接中&quot;);</span><br><span class="line">        mCamera.open();</span><br><span class="line">        mPhone.dail();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void hangup()&#123;</span><br><span class="line">        mPhone.hangup();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void takePicture()&#123;</span><br><span class="line">        mCamera.open();</span><br><span class="line">        mCamera.takePicture();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void closeCamera()&#123;</span><br><span class="line">        mCamera.close();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>Phone接口：</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package FacadeMode;</span><br><span class="line"></span><br><span class="line">public interface Phone &#123;</span><br><span class="line">    public void dail();</span><br><span class="line">    public void hangup();</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>PhoneImpl:</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package FacadeMode;</span><br><span class="line"></span><br><span class="line">public class PhoneImpl implements Phone &#123;</span><br><span class="line">    public void dail() &#123;</span><br><span class="line">        System.out.println(&quot;打电话&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void hangup() &#123;</span><br><span class="line">        System.out.println(&quot;挂断&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>Camera接口：</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package FacadeMode;</span><br><span class="line"></span><br><span class="line">public interface Camera &#123;</span><br><span class="line">    public void open();</span><br><span class="line">    public void takePicture();</span><br><span class="line">    public void close();</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>CameraImpl：</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package FacadeMode;</span><br><span class="line"></span><br><span class="line">public class CameraImpl implements Camera &#123;</span><br><span class="line">    public void open() &#123;</span><br><span class="line">        System.out.println(&quot;打开相机&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void takePicture() &#123;</span><br><span class="line">        System.out.println(&quot;拍照&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void close() &#123;</span><br><span class="line">        System.out.println(&quot;关闭相机&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>测试类：</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package FacadeMode;</span><br><span class="line"></span><br><span class="line">public class Test &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        MobilePhone mobilePhone&#x3D;new MobilePhone();</span><br><span class="line">        mobilePhone.takePicture();</span><br><span class="line">        mobilePhone.videoChat();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>输出结果：</strong></p>
+<img src="/2020/10/26/%E5%A4%96%E8%A7%82%E6%A8%A1%E5%BC%8F/142.png" class="" title="执行结果">
+
+<h2 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h2><p><strong>优点</strong>：</p>
+<ol>
+<li>对客户程序隐藏子系统细节，因而减少了客户对子系统的耦合，能够拥抱变化</li>
+<li>外观类对子系统的接口封装，使得系统更易于使用</li>
+</ol>
+<p><strong>缺点</strong>：</p>
+<ol>
+<li>外观类接口膨胀。由于子系统的接口都有外观类统一对外暴露，使得外观类的API接口较多，在一定程度上增加了用户使用成本</li>
+<li>外观类没有遵循开闭原则，当业务出现变更时，可能需要直接修改外观类</li>
+</ol>
+]]></content>
+      <categories>
+        <category>Android</category>
+      </categories>
+      <tags>
+        <tag>Android</tag>
+        <tag>编码规范</tag>
+        <tag>设计模式</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>桥接模式</title>
+    <url>/2020/10/26/%E6%A1%A5%E6%8E%A5%E6%A8%A1%E5%BC%8F/</url>
+    <content><![CDATA[<p>连接两地的交通枢纽-桥接模式</p>
+<a id="more"></a>
+
+<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>桥接模式也称为桥梁模式，是结构型设计模式之一。</p>
+<p><strong>定义</strong>：将抽象部分与现实部分分离，使它们都可以独立的进行变化</p>
+<h2 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h2><ol>
+<li>如果一个系统需要在构件的抽象化角色和具体化角色之间增加更多的灵活性，避免在两个层次之间建立静态的继承关系，可以通过桥接模式使它们在抽象层建立一个关联关系</li>
+<li>对于那些不希望使用继承或因为多层次继承导致系统类的个数极具增加的系统，也可以考虑使用桥接模式</li>
+<li>一个类存在两个独立变化的维度，且这两个维度都需要进行拓展</li>
+</ol>
+<h2 id="简单实现"><a href="#简单实现" class="headerlink" title="简单实现"></a>简单实现</h2><p><strong>咖啡抽象类：</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package BridgingMode;</span><br><span class="line"></span><br><span class="line">public abstract class Coffee &#123;</span><br><span class="line">    protected CoffeeAdditives impl;</span><br><span class="line"></span><br><span class="line">    public Coffee(CoffeeAdditives impl) &#123;</span><br><span class="line">        this.impl &#x3D; impl;</span><br><span class="line">    &#125;</span><br><span class="line">    public abstract void makeCoffee();</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>口味抽象类：</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package BridgingMode;</span><br><span class="line"></span><br><span class="line">public abstract class CoffeeAdditives &#123;</span><br><span class="line">    &#x2F;&#x2F;咖啡添加</span><br><span class="line">    public abstract String addSomeThing();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>大杯咖啡：</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package BridgingMode;</span><br><span class="line"></span><br><span class="line">public class LargeCoffee extends Coffee &#123;</span><br><span class="line">    public LargeCoffee(CoffeeAdditives impl) &#123;</span><br><span class="line">        super(impl);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void makeCoffee() &#123;</span><br><span class="line">        System.out.println(&quot;大杯的&quot;+impl+&quot;咖啡&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>小杯咖啡：</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package BridgingMode;</span><br><span class="line"></span><br><span class="line">public class SmallCoffee extends Coffee &#123;</span><br><span class="line">    public SmallCoffee(CoffeeAdditives impl) &#123;</span><br><span class="line">        super(impl);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void makeCoffee() &#123;</span><br><span class="line">        System.out.println(&quot;小杯的&quot;+impl+&quot;咖啡&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>原味：</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package BridgingMode;</span><br><span class="line"></span><br><span class="line">public class Ordinary extends CoffeeAdditives &#123;</span><br><span class="line">    public String addSomeThing() &#123;</span><br><span class="line">        return &quot;原味&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>加糖：</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package BridgingMode;</span><br><span class="line"></span><br><span class="line">public class Sugar extends CoffeeAdditives &#123;</span><br><span class="line">    public String addSomeThing() &#123;</span><br><span class="line">        return &quot;加糖&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>测试类</strong>：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">package BridgingMode;</span><br><span class="line"></span><br><span class="line">public class Test &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        &#x2F;&#x2F;原汁原味</span><br><span class="line">        Ordinary ordinary&#x3D;new Ordinary();</span><br><span class="line">        &#x2F;&#x2F;准备糖类</span><br><span class="line">        Sugar sugar&#x3D;new Sugar();</span><br><span class="line"></span><br><span class="line">        &#x2F;&#x2F;大杯咖啡，原味</span><br><span class="line">        LargeCoffee coffee1&#x3D;new LargeCoffee(ordinary);</span><br><span class="line">        coffee1.makeCoffee();</span><br><span class="line">        &#x2F;&#x2F;小杯咖啡，原味</span><br><span class="line">        SmallCoffee coffee2&#x3D;new SmallCoffee(ordinary);</span><br><span class="line">        coffee2.makeCoffee();</span><br><span class="line"></span><br><span class="line">        &#x2F;&#x2F;大杯咖啡，加糖</span><br><span class="line">        LargeCoffee largeCoffee&#x3D;new LargeCoffee(sugar);</span><br><span class="line">        largeCoffee.makeCoffee();</span><br><span class="line">        &#x2F;&#x2F;小杯咖啡，加糖</span><br><span class="line">        SmallCoffee smallCoffee&#x3D;new SmallCoffee(sugar);</span><br><span class="line">        smallCoffee.makeCoffee();</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>输出结果</strong>：</p>
+
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p><strong>优点</strong>：</p>
+<p>​    分离抽象与实现、灵活的拓展以及对客户来说透明的实现等，    </p>
+<p><strong>缺点</strong>：</p>
+<p>​    不容易设计，对开发者来说有一定的经验要求。因此，对桥接模式来说，理解很简单，设计却不容易。</p>
+]]></content>
+      <categories>
+        <category>Android</category>
+      </categories>
+      <tags>
+        <tag>Android</tag>
+        <tag>编码规范</tag>
+        <tag>设计模式</tag>
+      </tags>
+  </entry>
 </search>
